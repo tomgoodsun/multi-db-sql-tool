@@ -25,6 +25,15 @@ Shardingや分散DB環境に対して、同時にSQLを実行するツール。
   - For Excel and CSV exporting
 - AG Grid ( https://www.ag-grid.com/ ) or Handsontable ( https://handsontable.com/ )
   - For result showing
+- SQL Formatter ( https://github.com/sql-formatter-org/sql-formatter )
+  - For SQL beautification.
+
+## Coding Styles
+
+- PHP
+  - PSR-12
+- HTML, CSS, JavaScript
+  - Google or Mozilla Developer Network recommendation
 
 ## Configuration Sample
 
@@ -45,7 +54,7 @@ return [
     ],
 
     // Read-only mode
-    // true: select, show, describe only
+    // true: select, show, describe, desc, explain only
     // false: all queries are available
     'readonly_mode' => true,
 
@@ -55,3 +64,27 @@ return [
     ],
 ];
 ```
+
+## Usability
+
+- Layout
+  - Top is title area
+  - Left pane is selecting cluster and table lists
+  - Right upper pane is SQL editor
+  - Right lower pane is results
+- SQL editor displays line numbers.
+- SQL editor's font must be fixed-width.
+- Run SQL with the 'Run' button or Ctrl+Enter.
+- Run SQLs are stored in the temporary space, and possible to refer to and restore to SQL editor as history. When restoring, open dialog and the user can select history.
+- Clicking 'Beautify' to beautify mess SQLs.
+- SQL will be run separated with semi-colons.
+- Results are shown in tabs.
+- Tab label shows like 'Query 1(10)', query number and the number of found rows.
+- The first columns of result tables must be the name of shards (DB).
+- Exporting as XLSX downloads XLSX combining results in all tabs converting to sheets.
+- Clicking status display the following data in dialog:
+  - Connection status
+  - Existence of tables on each DB
+- When some shards or SQLs have errors, display them in the tab.
+
+![Multi-DB SQL Tool](mdbsql.png "Sample")
