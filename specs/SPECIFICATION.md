@@ -19,14 +19,15 @@ Shardingや分散DB環境に対して、同時にSQLを実行するツール。
   - For reset CSS
 - Bootstrap 5.x ( https://getbootstrap.com/ )
   - For base design system
-- CodeMirror ( https://codemirror.net/ )
+- CodeMirror 6.x ( https://codemirror.net/ )
   - For SQL Editor
-- SheetJS ( https://qiita.com/tomgoodsun/items/0107e5d778b803935fc0 )
+- SheetJS ( https://docs.sheetjs.com/ )
   - For Excel and CSV exporting
-- AG Grid ( https://www.ag-grid.com/ ) or Handsontable ( https://handsontable.com/ )
-  - For result showing
+  - Reference implementation: https://qiita.com/tomgoodsun/items/0107e5d778b803935fc0
+- AG Grid Community ( https://www.ag-grid.com/ )
+  - For result showing (preferred over Handsontable for licensing)
 - SQL Formatter ( https://github.com/sql-formatter-org/sql-formatter )
-  - For SQL beautification.
+  - For SQL beautification
 
 ## Coding Styles
 
@@ -62,6 +63,27 @@ return [
     'basic_auth' => [
         //['user', 'password'],
     ],
+
+    // Session configuration
+    'session' => [
+        'name' => 'MDBSQL_SESSION',
+        'lifetime' => 86400, // 24 hours
+        'max_history' => 50,
+    ],
+
+    // Query execution limits
+    'limits' => [
+        'max_execution_time' => 30,
+        'max_rows_per_query' => 10000,
+        'max_queries_per_request' => 10,
+    ],
+
+    // UI settings
+    'ui' => [
+        'theme' => 'light', // 'light' or 'dark'
+        'editor_theme' => 'default', // CodeMirror theme
+        'items_per_page' => 100,
+    ],
 ];
 ```
 
@@ -69,22 +91,40 @@ return [
 
 - Layout
   - Top is title area
-  - Left pane is selecting cluster and table lists
-  - Right upper pane is SQL editor
-  - Right lower pane is results
-- SQL editor displays line numbers.
-- SQL editor's font must be fixed-width.
-- Run SQL with the 'Run' button or Ctrl+Enter.
-- Run SQLs are stored in the temporary space, and possible to refer to and restore to SQL editor as history. When restoring, open dialog and the user can select history.
-- Clicking 'Beautify' to beautify mess SQLs.
-- SQL will be run separated with semi-colons.
-- Results are shown in tabs.
-- Tab label shows like 'Query 1(10)', query number and the number of found rows.
-- The first columns of result tables must be the name of shards (DB).
-- Exporting as XLSX downloads XLSX combining results in all tabs converting to sheets.
-- Clicking status display the following data in dialog:
-  - Connection status
-  - Existence of tables on each DB
-- When some shards or SQLs have errors, display them in the tab.
+  - Left pane is selecting cluster and table lists with connection status
+  - Right upper pane is SQL editor with toolbar (Run, Beautify, History, Clear)
+  - Right lower pane is results displayed in tabs
+- SQL editor displays line numbers and syntax highlighting
+- SQL editor's font must be fixed-width (monospace)
+- Run SQL with the 'Run' button or Ctrl+Enter
+- Run SQLs are stored in session-based history, accessible via 'History' button
+- History dialog allows selection and restoration of previous queries
+- 'Beautify' button formats and indents SQL queries
+- SQL statements are separated by semicolons and executed sequentially
+- Results are displayed in tabs with labels showing query number and row count
+- Tab labels format: 'Query 1 (10 rows)' or 'Query 1 (Error)'
+- First column of result tables shows shard/database name
+- Export functionality creates XLSX file with each tab as a separate worksheet
+- Status dialog shows:
+  - Connection status for each shard
+  - Table existence verification across shards
+  - Query execution statistics
+- Error handling displays errors in dedicated tabs with detailed information
+- Responsive design supporting desktop and tablet views
+
+## Security Considerations
+
+- Basic authentication support for production environments
+- Read-only mode enforcement at query parsing level
+- SQL injection prevention through prepared statements where applicable
+- Session security with configurable timeout
+- Input sanitization and output escaping
+
+## Performance Considerations
+
+- Concurrent query execution across shards
+- Configurable row limits to prevent memory exhaustion
+- Query timeout settings
+- Efficient result set handling for large datasets
 
 ![Multi-DB SQL Tool](mdbsql.png "Sample")
