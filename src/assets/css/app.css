@@ -12,7 +12,7 @@
 
   --sidebar-width: 300px;
   --header-height: 60px;
-  --editor-height: 40vh;
+  --editor-height: 60vh;
 }
 
 html, body {
@@ -29,7 +29,7 @@ html, body {
     "sidebar editor"
     "sidebar results";
   grid-template-columns: var(--sidebar-width) 1fr;
-  grid-template-rows: var(--header-height) var(--editor-height) 1fr;
+  grid-template-rows: var(--header-height) 2fr 3fr;
   height: 100vh;
   overflow: hidden;
 }
@@ -151,6 +151,8 @@ html, body {
   display: flex;
   flex-direction: column;
   border-bottom: 1px solid #dee2e6;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .editor-toolbar {
@@ -178,12 +180,42 @@ html, body {
 .sql-editor-container {
   flex: 1;
   position: relative;
+  height: calc(100% - 23px);
+  border: 1px solid #ddd;
+}
+
+#sql-editor {
+  height: inherit;
 }
 
 .CodeMirror {
-  height: 100%;
+  height: 100% !important;
+  width: 100% !important;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-  font-size: 14px;
+  font-size: 12px;
+  border: none;
+  border-radius: 4px;
+}
+
+.CodeMirror-scroll {
+  height: 100% !important;
+  overflow: auto !important;
+}
+
+.CodeMirror-gutters {
+  border-right: 1px solid #ddd !important;
+}
+
+.CodeMirror-sizer {
+  min-height: 100% !important;
+}
+
+.CodeMirror-lines {
+  padding: 4px 0;
+}
+
+.CodeMirror-scrollbar-filler {
+  background-color: transparent;
 }
 
 /* Results Area */

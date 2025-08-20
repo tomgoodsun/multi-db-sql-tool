@@ -40,21 +40,65 @@ class MultiDbSqlTool {
 
     this.editor = CodeMirror(editorElement, {
       mode: 'text/x-mysql',
-      theme: 'monokai',
+      theme: 'eclipse',
       lineNumbers: true,
       indentUnit: 2,
       smartIndent: true,
-      lineWrapping: true,
+      lineWrapping: false,
+      viewportMargin: Infinity,
       extraKeys: {
         "Ctrl-Enter": () => {
           this.executeQuery();
         },
         "Ctrl-Space": "autocomplete"
       },
-      value: 'SELECT\n  *\nFROM\n  tbl1\nWHERE\n  id IN (1, 2, 3);'
+      value: ''
     });
 
+    // エディターサイズを領域にフィットさせる
     this.editor.setSize('100%', '100%');
+    
+    // 初期化後に確実にサイズを適用
+    setTimeout(() => {
+      // CodeMirrorの内部要素に直接サイズを設定
+      const wrapper = this.editor.getWrapperElement();
+      if (wrapper) {
+        wrapper.style.height = '100%';
+        wrapper.style.width = '100%';
+      }
+      
+      const scrollElement = this.editor.getScrollerElement();
+      if (scrollElement) {
+        scrollElement.style.height = '100%';
+      }
+      
+      // ガッターの高さを動的に設定
+      this.adjustGutterHeight();
+      
+      // 最終的にリフレッシュ
+      this.editor.refresh();
+    }, 100);
+    
+    // リサイズ時の調整
+    window.addEventListener('resize', () => {
+      this.editor.refresh();
+      setTimeout(() => this.adjustGutterHeight(), 50);
+    });
+  }
+
+  /**
+   * Adjust CodeMirror gutter height
+   */
+  adjustGutterHeight() {
+    if (!this.editor) return;
+    
+    const wrapper = this.editor.getWrapperElement();
+    const gutters = wrapper?.querySelector('.CodeMirror-gutters');
+    
+    if (gutters && wrapper) {
+      const wrapperHeight = wrapper.offsetHeight;
+      gutters.style.height = `${wrapperHeight}px`;
+    }
   }
 
   /**
@@ -95,6 +139,12 @@ class MultiDbSqlTool {
     const sql = this.editor.getValue().trim();
     if (!sql) {
       this.showAlert('Please enter a SQL query', 'warning');
+      return;
+    }
+
+    // SQL実行前の警告ダイアログ
+    const confirmed = await this.showExecutionWarning(sql);
+    if (!confirmed) {
       return;
     }
 
@@ -518,6 +568,88 @@ class MultiDbSqlTool {
   }
 
   /**
+   * Create confirmation modal
+   */
+  createConfirmationModal(title, content, onConfirm, onCancel) {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        onCancel();
+        this.removeModal(overlay);
+      }
+    });
+
+    const modal = document.createElement('div');
+    modal.className = 'modal-content';
+    modal.style.maxWidth = '600px';
+
+    const header = document.createElement('div');
+    header.className = 'modal-header';
+    header.innerHTML = `
+      <h5>${this.escapeHtml(title)}</h5>
+      <button type="button" class="btn-close" onclick="event.stopPropagation()">×</button>
+    `;
+    
+    header.querySelector('.btn-close').addEventListener('click', () => {
+      onCancel();
+      this.removeModal(overlay);
+    });
+
+    const body = document.createElement('div');
+    body.className = 'modal-body';
+    body.appendChild(content);
+
+    const footer = document.createElement('div');
+    footer.className = 'modal-footer';
+    
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'btn btn-secondary';
+    cancelBtn.textContent = 'キャンセル';
+    cancelBtn.addEventListener('click', () => {
+      onCancel();
+      this.removeModal(overlay);
+    });
+    
+    const confirmBtn = document.createElement('button');
+    confirmBtn.className = 'btn btn-danger';
+    confirmBtn.textContent = '実行する';
+    confirmBtn.addEventListener('click', () => {
+      onConfirm();
+      this.removeModal(overlay);
+    });
+    
+    footer.appendChild(cancelBtn);
+    footer.appendChild(confirmBtn);
+
+    modal.appendChild(header);
+    modal.appendChild(body);
+    modal.appendChild(footer);
+    overlay.appendChild(modal);
+
+    return overlay;
+  }
+
+  /**
+   * Remove modal from DOM
+   */
+  removeModal(modal) {
+    if (modal && modal.parentElement) {
+      modal.remove();
+    }
+  }
+
+  /**
+   * Close modal
+   */
+  closeModal() {
+    const modal = document.querySelector('.modal-overlay');
+    if (modal) {
+      modal.remove();
+    }
+  }
+
+  /**
    * Select history item
    */
   selectHistoryItem(sql) {
@@ -563,13 +695,107 @@ class MultiDbSqlTool {
   }
 
   /**
-   * Close modal
+   * Show execution warning dialog
    */
-  closeModal() {
-    const modal = document.querySelector('.modal-overlay');
-    if (modal) {
-      modal.remove();
+  showExecutionWarning(sql) {
+    return new Promise((resolve) => {
+      const sqlType = this.detectSqlType(sql);
+      const isDangerous = ['UPDATE', 'DELETE', 'DROP', 'TRUNCATE', 'ALTER', 'CREATE', 'INSERT'].includes(sqlType);
+      
+      const warningContent = this.createExecutionWarningContent(sql, sqlType, isDangerous);
+      const modal = this.createConfirmationModal(
+        'SQL実行確認',
+        warningContent,
+        () => resolve(true),
+        () => resolve(false)
+      );
+      
+      document.body.appendChild(modal);
+    });
+  }
+
+  /**
+   * Detect SQL type
+   */
+  detectSqlType(sql) {
+    const cleanSql = sql.trim().toUpperCase();
+    
+    if (cleanSql.startsWith('SELECT')) return 'SELECT';
+    if (cleanSql.startsWith('INSERT')) return 'INSERT';
+    if (cleanSql.startsWith('UPDATE')) return 'UPDATE';
+    if (cleanSql.startsWith('DELETE')) return 'DELETE';
+    if (cleanSql.startsWith('DROP')) return 'DROP';
+    if (cleanSql.startsWith('TRUNCATE')) return 'TRUNCATE';
+    if (cleanSql.startsWith('ALTER')) return 'ALTER';
+    if (cleanSql.startsWith('CREATE')) return 'CREATE';
+    if (cleanSql.startsWith('SHOW')) return 'SHOW';
+    if (cleanSql.startsWith('DESCRIBE') || cleanSql.startsWith('DESC')) return 'DESCRIBE';
+    if (cleanSql.startsWith('EXPLAIN')) return 'EXPLAIN';
+    
+    return 'UNKNOWN';
+  }
+
+  /**
+   * Create execution warning content
+   */
+  createExecutionWarningContent(sql, sqlType, isDangerous) {
+    const container = document.createElement('div');
+    
+    // メイン警告メッセージ
+    const mainWarning = document.createElement('div');
+    mainWarning.className = `alert ${isDangerous ? 'alert-danger' : 'alert-warning'} mb-3`;
+    mainWarning.innerHTML = `
+      <h6><i class="bi ${isDangerous ? 'bi-exclamation-triangle-fill' : 'bi-info-circle-fill'}"></i> 
+      ${isDangerous ? '危険なSSQL実行確認' : 'SQL実行確認'}</h6>
+      <p class="mb-0">
+        ${isDangerous 
+          ? 'このSQLはデータを変更・削除する可能性があります。' 
+          : 'このSQLを全てのデータベースに実行します。'
+        }
+      </p>
+    `;
+    container.appendChild(mainWarning);
+
+    // SQLタイプ表示
+    const sqlTypeDiv = document.createElement('div');
+    sqlTypeDiv.className = 'mb-3';
+    sqlTypeDiv.innerHTML = `<strong>SQLタイプ:</strong> <span class="badge bg-${isDangerous ? 'danger' : 'primary'}">${sqlType}</span>`;
+    container.appendChild(sqlTypeDiv);
+
+    // SQLプレビュー
+    const sqlPreview = document.createElement('div');
+    sqlPreview.className = 'mb-3';
+    sqlPreview.innerHTML = `
+      <strong>SQL:</strong>
+      <pre class="bg-light p-2 border rounded" style="max-height: 150px; overflow-y: auto; font-size: 0.875rem;">${this.escapeHtml(sql)}</pre>
+    `;
+    container.appendChild(sqlPreview);
+
+    // 実行対象DB情報
+    const dbInfo = document.createElement('div');
+    dbInfo.className = 'alert alert-info';
+    dbInfo.innerHTML = `
+      <h6><i class="bi bi-database"></i> 実行対象データベース</h6>
+      <p class="mb-0">現在のクラスター内の<strong>全てのシャード</strong>に実行されます。</p>
+    `;
+    container.appendChild(dbInfo);
+
+    if (isDangerous) {
+      // 危険メッセージ
+      const dangerWarning = document.createElement('div');
+      dangerWarning.className = 'alert alert-danger border-danger';
+      dangerWarning.innerHTML = `
+        <h6><i class="bi bi-shield-exclamation"></i> 重要な警告</h6>
+        <ul class="mb-0">
+          <li>この操作は<strong>元に戻せません</strong></li>
+          <li>本番環境での実行は特に注意が必要です</li>
+          <li>必要に応じてバックアップを取ってください</li>
+        </ul>
+      `;
+      container.appendChild(dangerWarning);
     }
+
+    return container;
   }
 
   /**
