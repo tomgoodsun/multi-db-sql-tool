@@ -114,7 +114,11 @@ try {
         <div style="position: fixed; bottom: 10px; left: 10px; background: #000; color: #fff; padding: 10px; font-size: 12px; z-index: 9999;">
             Current Language: <?= Language::getCurrentLanguage() ?><br>
             Session Language: <?= $_SESSION['language'] ?? 'not set' ?><br>
-            Available Languages: <?= implode(', ', array_keys(Language::getAvailableLanguages())) ?>
+            Available Languages: <?= implode(', ', array_keys(Language::getAvailableLanguages())) ?><br>
+            App Name Translation: <?= Language::get('app_name') ?><br>
+            Read Only Translation: <?= Language::get('read_only') ?><br>
+            Session ID: <?= session_id() ?><br>
+            Session Status: <?= session_status() ?>
         </div>
     <?php endif; ?>
 

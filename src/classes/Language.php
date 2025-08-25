@@ -59,10 +59,17 @@ class Language
     public static function get(string $key, array $replace = []): string
     {
         if (empty(self::$translations)) {
+            error_log('Language::get - Translations empty, loading...');
             self::loadTranslations();
         }
 
         $translation = self::$translations[$key] ?? $key;
+        
+        // デバッグ情報（特定のキーのみ）
+        if ($key === 'app_name') {
+            error_log('Language::get - Key: ' . $key . ', Translation: ' . $translation . ', Current lang: ' . self::$currentLanguage);
+            error_log('Language::get - Translations count: ' . count(self::$translations));
+        }
 
         // プレースホルダーの置換
         if (!empty($replace)) {
@@ -87,6 +94,13 @@ class Language
         if (file_exists($langFile)) {
             self::$translations = require $langFile;
             error_log('Language::loadTranslations - Loaded ' . count(self::$translations) . ' translations');
+            // サンプル翻訳をログ出力
+            if (isset(self::$translations['app_name'])) {
+                error_log('Language::loadTranslations - app_name sample: ' . self::$translations['app_name']);
+            }
+            if (isset(self::$translations['read_only'])) {
+                error_log('Language::loadTranslations - read_only sample: ' . self::$translations['read_only']);
+            }
         } else {
             // フォールバック: 英語
             $fallbackFile = __DIR__ . '/../lang/en.php';
@@ -111,15 +125,24 @@ class Language
         
         // デバッグ情報
         error_log('Language init - Session language: ' . ($_SESSION['language'] ?? 'not set'));
+        error_log('Language init - Current static language before: ' . self::$currentLanguage);
+        
+        // 静的変数を強制的にリセット
+        self::$translations = [];
         
         if (isset($_SESSION['language']) && array_key_exists($_SESSION['language'], self::$availableLanguages)) {
-            self::setLanguage($_SESSION['language']);
-            error_log('Language set to: ' . self::$currentLanguage);
+            self::$currentLanguage = $_SESSION['language'];
+            self::loadTranslations();
+            error_log('Language set to from session: ' . self::$currentLanguage);
         } else {
             // デフォルトは英語
-            self::setLanguage('en');
+            self::$currentLanguage = 'en';
+            self::loadTranslations();
             error_log('Language set to default: en');
         }
+        
+        error_log('Language init - Final language: ' . self::$currentLanguage);
+        error_log('Language init - Translations loaded: ' . count(self::$translations));
     }
 
     /**
