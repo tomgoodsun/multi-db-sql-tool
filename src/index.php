@@ -15,6 +15,10 @@ spl_autoload_register(function ($className) {
     }
 });
 
+// 言語初期化
+Language::initFromSession();
+Language::handleLanguageChange();
+
 // エラーハンドリング
 error_reporting(E_ALL);
 ini_set('display_errors', 0); // 本番では非表示
@@ -38,7 +42,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($appName ?? 'Multi-DB SQL Tool') ?></title>
+    <title><?= htmlspecialchars(Language::get('app_name')) ?></title>
     
     <!-- CSS Libraries -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" rel="stylesheet">
@@ -61,8 +65,17 @@ try {
     <div class="app-container">
         <!-- Header -->
         <div class="header">
-            <h1><?= htmlspecialchars($appName ?? 'Multi-DB SQL Tool') ?></h1>
+            <h1><?= htmlspecialchars(Language::get('app_name')) ?></h1>
             <div class="header-controls">
+                <!-- Language Selector -->
+                <select id="language-selector" class="form-select form-select-sm me-2" style="width: auto;">
+                    <?php foreach (Language::getAvailableLanguages() as $code => $name): ?>
+                        <option value="<?= htmlspecialchars($code) ?>" <?= Language::getCurrentLanguage() === $code ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($name) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                
                 <?php if (!empty($clusters) && count($clusters) > 1): ?>
                     <select id="cluster-selector" class="form-select form-select-sm">
                         <?php foreach ($clusters as $cluster): ?>
@@ -74,9 +87,9 @@ try {
                 <?php endif; ?>
                 
                 <?php if (Config::isReadOnlyMode()): ?>
-                    <span class="badge bg-warning">READ ONLY</span>
+                    <span class="badge bg-warning"><?= Language::get('read_only') ?></span>
                 <?php else: ?>
-                    <span class="badge bg-danger">WRITE ENABLED</span>
+                    <span class="badge bg-danger"><?= Language::get('write_enabled') ?></span>
                 <?php endif; ?>
             </div>
         </div>
@@ -88,7 +101,7 @@ try {
                 <div class="d-flex align-items-center mb-2">
                     <input type="checkbox" id="db-table-status" class="form-check-input me-2" checked>
                     <label for="db-table-status" class="form-check-label">
-                        <h5 class="mb-0">DB & table status</h5>
+                        <h5 class="mb-0"><?= Language::get('db_table_status') ?></h5>
                     </label>
                 </div>
                 <div id="connection-status" class="connection-status">
@@ -105,7 +118,7 @@ try {
 
             <!-- Tables -->
             <div class="sidebar-section">
-                <h5>Tables</h5>
+                <h5><?= Language::get('tables') ?></h5>
                 <div id="tables-list" class="table-list">
                     <?php if (isset($tablesInfo)): ?>
                         <?php
@@ -119,7 +132,7 @@ try {
                         <?php foreach ($allTables as $table): ?>
                             <div class="table-item">
                                 <div class="table-physical-name"><?= htmlspecialchars($table) ?></div>
-                                <div class="table-logical-name">Table <?= htmlspecialchars($table) ?></div>
+                                <div class="table-logical-name"><?= Language::get('logical_name') ?> <?= htmlspecialchars($table) ?></div>
                             </div>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -132,21 +145,21 @@ try {
             <div class="editor-toolbar">
                 <div class="toolbar-left">
                     <button id="btn-history" class="btn btn-outline-secondary btn-sm">
-                        <i class="bi bi-clock-history"></i> History
+                        <i class="bi bi-clock-history"></i> <?= Language::get('history') ?>
                     </button>
                 </div>
                 <div class="toolbar-center">
                     <button id="btn-format" class="btn btn-outline-secondary btn-sm">
-                        <i class="bi bi-code"></i> Beautify SQL
+                        <i class="bi bi-code"></i> <?= Language::get('beautify_sql') ?>
                     </button>
                     <button id="btn-execute" class="btn btn-primary btn-sm">
-                        <i class="bi bi-play-fill"></i> Run (Ctrl+Enter)
+                        <i class="bi bi-play-fill"></i> <?= Language::get('run') ?>
                     </button>
                 </div>
                 <div class="toolbar-right">
-                    <span class="me-2">Export:</span>
-                    <button id="btn-export-csv" class="btn btn-outline-success btn-sm me-1">CSV</button>
-                    <button id="btn-export" class="btn btn-outline-success btn-sm">XLSX</button>
+                    <span class="me-2"><?= Language::get('export') ?></span>
+                    <button id="btn-export-csv" class="btn btn-outline-success btn-sm me-1"><?= Language::get('csv') ?></button>
+                    <button id="btn-export" class="btn btn-outline-success btn-sm"><?= Language::get('xlsx') ?></button>
                 </div>
             </div>
             <div class="sql-editor-container">
@@ -170,7 +183,7 @@ try {
             <div id="results-content" class="results-content">
                 <div class="p-4 text-center text-muted">
                     <i class="bi bi-database" style="font-size: 3rem; opacity: 0.3;"></i>
-                    <p class="mt-3">Execute a SQL query to see results here</p>
+                    <p class="mt-3"><?= Language::get('execute_sql_message') ?></p>
                 </div>
             </div>
         </div>

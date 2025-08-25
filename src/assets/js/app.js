@@ -115,6 +115,10 @@ class MultiDbSqlTool {
       this.switchCluster(e.target.value);
     });
 
+    document.getElementById('language-selector')?.addEventListener('change', (e) => {
+      this.switchLanguage(e.target.value);
+    });
+
     document.getElementById('tab-nav-left')?.addEventListener('click', () => this.scrollTabs('left'));
     document.getElementById('tab-nav-right')?.addEventListener('click', () => this.scrollTabs('right'));
 
@@ -218,6 +222,24 @@ class MultiDbSqlTool {
       }
     } catch (error) {
       console.error('Status load error:', error);
+    }
+  }
+
+  /**
+   * Switch language
+   */
+  async switchLanguage(language) {
+    try {
+      const response = await this.apiCall('set_language', { language });
+      if (response.success) {
+        // ページをリロードして新しい言語を反映
+        window.location.reload();
+      } else {
+        throw new Error(response.error);
+      }
+    } catch (error) {
+      console.error('Language switch error:', error);
+      this.showAlert('Failed to switch language: ' + error.message, 'danger');
     }
   }
 
