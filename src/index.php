@@ -43,6 +43,8 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars(Language::get('app_name')) ?></title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="alternate icon" href="favicon.ico">
     
     <!-- CSS Libraries -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" rel="stylesheet">
@@ -57,6 +59,44 @@ try {
     
     <!-- Custom CSS -->
     <link href="assets/css/app.css" rel="stylesheet">
+    
+    <!-- JavaScript translations -->
+    <script>
+        window.translations = <?= json_encode([
+            'enter_sql_query' => Language::get('enter_sql_query'),
+            'query_executed_successfully' => Language::get('query_executed_successfully'),
+            'query_execution_failed' => Language::get('query_execution_failed'),
+            'format_successful' => Language::get('format_successful'),
+            'format_failed' => Language::get('format_failed'),
+            'history_load_failed' => Language::get('history_load_failed'),
+            'cluster_switched' => Language::get('cluster_switched'),
+            'cluster_switch_failed' => Language::get('cluster_switch_failed'),
+            'language_changed' => Language::get('language_changed'),
+            'initialization_failed' => Language::get('initialization_failed'),
+            'no_results_to_export' => Language::get('no_results_to_export'),
+            'results_exported_successfully' => Language::get('results_exported_successfully'),
+            'csv_export_successful' => Language::get('csv_export_successful'),
+            'csv_export_failed' => Language::get('csv_export_failed'),
+            'export_failed' => Language::get('export_failed'),
+            'sql_execution_confirmation' => Language::get('sql_execution_confirmation'),
+            'dangerous_sql_confirmation' => Language::get('dangerous_sql_confirmation'),
+            'sql_will_execute_on_all_dbs' => Language::get('sql_will_execute_on_all_dbs'),
+            'sql_may_modify_data' => Language::get('sql_may_modify_data'),
+            'sql_type' => Language::get('sql_type'),
+            'target_databases' => Language::get('target_databases'),
+            'current_cluster_all_shards' => Language::get('current_cluster_all_shards'),
+            'important_warning' => Language::get('important_warning'),
+            'operation_irreversible' => Language::get('operation_irreversible'),
+            'production_caution' => Language::get('production_caution'),
+            'backup_recommended' => Language::get('backup_recommended'),
+            'execute' => Language::get('execute'),
+            'cancel' => Language::get('cancel'),
+            'query_history' => Language::get('query_history'),
+            'no_history_available' => Language::get('no_history_available'),
+            'no_data_returned' => Language::get('no_data_returned'),
+            'close' => Language::get('close')
+        ], JSON_UNESCAPED_UNICODE) ?>;
+    </script>
 </head>
 <body>
     <!-- Alert Container -->

@@ -20,6 +20,26 @@ class ApiHandler
     }
 
     /**
+     * 言語切り替え
+     */
+    private function handleSetLanguage(): void
+    {
+        $language = $_POST['language'] ?? 'en';
+        
+        $availableLanguages = Language::getAvailableLanguages();
+        if (!array_key_exists($language, $availableLanguages)) {
+            throw new Exception('Invalid language code');
+        }
+        
+        Language::setLanguage($language);
+        
+        $this->sendSuccess([
+            'language' => Language::getCurrentLanguage(),
+            'message' => Language::get('language_changed')
+        ]);
+    }
+
+    /**
     * APIリクエストを処理
     */
     public function handle(): void
@@ -49,6 +69,9 @@ class ApiHandler
                     break;
                 case 'switch_cluster':
                     $this->handleSwitchCluster();
+                    break;
+                case 'set_language':
+                    $this->handleSetLanguage();
                     break;
                 default:
                     throw new Exception('Invalid action');

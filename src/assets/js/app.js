@@ -9,8 +9,16 @@ class MultiDbSqlTool {
     this.currentResults = {};
     this.activeTab = null;
     this.isExecuting = false;
+    this.translations = window.translations || {};
 
     this.init();
+  }
+
+  /**
+   * Get translated text
+   */
+  t(key) {
+    return this.translations[key] || key;
   }
 
   /**
@@ -25,7 +33,7 @@ class MultiDbSqlTool {
       console.log('Multi-DB SQL Tool initialized successfully');
     } catch (error) {
       console.error('Failed to initialize application:', error);
-      this.showAlert('Failed to initialize application: ' + error.message, 'danger');
+      this.showAlert(this.t('initialization_failed') + ': ' + error.message, 'danger');
     }
   }
 
@@ -142,7 +150,7 @@ class MultiDbSqlTool {
 
     const sql = this.editor.getValue().trim();
     if (!sql) {
-      this.showAlert('Please enter a SQL query', 'warning');
+      this.showAlert(this.t('enter_sql_query'), 'warning');
       return;
     }
 
@@ -159,13 +167,13 @@ class MultiDbSqlTool {
 
       if (response.success) {
         this.displayResults(response.data.results);
-        this.showAlert('Query executed successfully', 'success');
+        this.showAlert(this.t('query_executed_successfully'), 'success');
       } else {
         throw new Error(response.error);
       }
     } catch (error) {
       console.error('Query execution error:', error);
-      this.showAlert('Query execution failed: ' + error.message, 'danger');
+      this.showAlert(this.t('query_execution_failed') + ': ' + error.message, 'danger');
     } finally {
       this.setExecuting(false);
     }
@@ -239,7 +247,7 @@ class MultiDbSqlTool {
       }
     } catch (error) {
       console.error('Language switch error:', error);
-      this.showAlert('Failed to switch language: ' + error.message, 'danger');
+      this.showAlert(this.t('cluster_switch_failed') + ': ' + error.message, 'danger');
     }
   }
 
@@ -951,7 +959,7 @@ class MultiDbSqlTool {
         executeBtn.innerHTML = '<span class="loading"></span> Executing...';
       } else {
         executeBtn.disabled = false;
-        executeBtn.innerHTML = '<i class="bi bi-play-fill"></i> Run (Ctrl+Enter)';
+        executeBtn.innerHTML = '<i class="bi bi-play-fill"></i> ' + this.t('run');
       }
     }
   }
