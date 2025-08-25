@@ -16,8 +16,15 @@ spl_autoload_register(function ($className) {
 });
 
 // 言語初期化
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 Language::initFromSession();
 Language::handleLanguageChange();
+
+// デバッグ: 現在の言語状態を確認
+error_log('index.php - Current language: ' . Language::getCurrentLanguage());
+error_log('index.php - Session language: ' . ($_SESSION['language'] ?? 'not set'));
 
 // エラーハンドリング
 error_reporting(E_ALL);
@@ -101,6 +108,15 @@ try {
 <body>
     <!-- Alert Container -->
     <div id="alert-container" style="position: fixed; top: 70px; right: 20px; z-index: 1060; width: 400px;"></div>
+    
+    <!-- Debug info -->
+    <?php if (isset($_GET['debug'])): ?>
+        <div style="position: fixed; bottom: 10px; left: 10px; background: #000; color: #fff; padding: 10px; font-size: 12px; z-index: 9999;">
+            Current Language: <?= Language::getCurrentLanguage() ?><br>
+            Session Language: <?= $_SESSION['language'] ?? 'not set' ?><br>
+            Available Languages: <?= implode(', ', array_keys(Language::getAvailableLanguages())) ?>
+        </div>
+    <?php endif; ?>
 
     <div class="app-container">
         <!-- Header -->

@@ -26,12 +26,17 @@ class ApiHandler
     {
         $language = $_POST['language'] ?? 'en';
         
+        error_log('ApiHandler::handleSetLanguage - Requested language: ' . $language);
+        
         $availableLanguages = Language::getAvailableLanguages();
         if (!array_key_exists($language, $availableLanguages)) {
+            error_log('ApiHandler::handleSetLanguage - Invalid language code: ' . $language);
             throw new Exception('Invalid language code');
         }
         
         Language::setLanguage($language);
+        
+        error_log('ApiHandler::handleSetLanguage - Language set, current: ' . Language::getCurrentLanguage());
         
         $this->sendSuccess([
             'language' => Language::getCurrentLanguage(),

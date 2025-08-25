@@ -27,6 +27,13 @@ class Language
                 session_start();
             }
             $_SESSION['language'] = $language;
+            
+            // デバッグ情報
+            error_log('Language::setLanguage - Set to: ' . $language);
+            error_log('Language::setLanguage - Session saved: ' . $_SESSION['language']);
+            error_log('Language::setLanguage - Translations loaded: ' . count(self::$translations));
+        } else {
+            error_log('Language::setLanguage - Invalid language: ' . $language);
         }
     }
 
@@ -74,13 +81,21 @@ class Language
     {
         $langFile = __DIR__ . '/../lang/' . self::$currentLanguage . '.php';
         
+        error_log('Language::loadTranslations - Loading: ' . $langFile);
+        error_log('Language::loadTranslations - File exists: ' . (file_exists($langFile) ? 'yes' : 'no'));
+        
         if (file_exists($langFile)) {
             self::$translations = require $langFile;
+            error_log('Language::loadTranslations - Loaded ' . count(self::$translations) . ' translations');
         } else {
             // フォールバック: 英語
             $fallbackFile = __DIR__ . '/../lang/en.php';
+            error_log('Language::loadTranslations - Using fallback: ' . $fallbackFile);
             if (file_exists($fallbackFile)) {
                 self::$translations = require $fallbackFile;
+                error_log('Language::loadTranslations - Fallback loaded: ' . count(self::$translations) . ' translations');
+            } else {
+                error_log('Language::loadTranslations - Fallback file not found!');
             }
         }
     }
@@ -94,11 +109,16 @@ class Language
             session_start();
         }
         
+        // デバッグ情報
+        error_log('Language init - Session language: ' . ($_SESSION['language'] ?? 'not set'));
+        
         if (isset($_SESSION['language']) && array_key_exists($_SESSION['language'], self::$availableLanguages)) {
             self::setLanguage($_SESSION['language']);
+            error_log('Language set to: ' . self::$currentLanguage);
         } else {
             // デフォルトは英語
             self::setLanguage('en');
+            error_log('Language set to default: en');
         }
     }
 
