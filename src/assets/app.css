@@ -87,9 +87,8 @@ html, body {
   letter-spacing: 0.5px;
 }
 
-.cluster-selector {
-  width: 100%;
-  font-size: 0.875rem;
+#cluster-selector {
+  width: auto;
 }
 
 .connection-status {
