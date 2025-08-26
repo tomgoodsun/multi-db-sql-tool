@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multi-DB SQL Tool</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="alternate icon" href="favicon.ico">
+
+  <!-- CSS Libraries -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/eclipse.min.css" rel="stylesheet">
+
+  <!-- AG Grid -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/ag-grid/31.0.0/ag-grid.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/ag-grid/31.0.0/ag-theme-alpine.min.css" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <link href="assets/app.css" rel="stylesheet">
+</head>
+<body>
+
+  <div class="container-fluid app-container">
+    <!-- header -->
+    <div class="header">
+      <h1>Multi-DB SQL Tool</h1>
+    </div>
+
+    <div class="row app-content">
+      <!-- sidebar -->
+      <div class="col-2 left-pane sidebar">
+        <!-- Connection Status -->
+        <div class="sidebar-section">
+          <h5>Status</h5>
+          <div class="status-list">
+            <div class="status-item">
+              <div class="status-indicator"></div>
+              <span>shard1</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table list -->
+        <div class="sidebar-section">
+          <h5>Table List</h5>
+          <div class="table-list">
+            <div class="table-item">
+              <div class="table-physical-name">user</div>
+              <div class="table-logical-name">User</div>
+            </div>
+
+            <div class="table-item">
+              <div class="table-physical-name">introduced_user_profile_header</div>
+              <div class="table-logical-name">Introduced User Profile Header (Unique)</div>
+            </div>
+
+            <div class="table-item">
+              <div class="table-physical-name">user</div>
+              <div class="table-logical-name">User</div>
+            </div>
+            <div class="table-item">
+              <div class="table-physical-name">user</div>
+              <div class="table-logical-name">User</div>
+            </div>
+            <div class="table-item">
+              <div class="table-physical-name">user</div>
+              <div class="table-logical-name">User</div>
+            </div>
+            <div class="table-item">
+              <div class="table-physical-name">user</div>
+              <div class="table-logical-name">User</div>
+            </div>
+            <div class="table-item">
+              <div class="table-physical-name">user</div>
+              <div class="table-logical-name">User</div>
+            </div>
+            <div class="table-item">
+              <div class="table-physical-name">user</div>
+              <div class="table-logical-name">User</div>
+            </div>
+            <div class="table-item">
+              <div class="table-physical-name">user</div>
+              <div class="table-logical-name">User</div>
+            </div>
+            <div class="table-item">
+              <div class="table-physical-name">user</div>
+              <div class="table-logical-name">User</div>
+            </div>
+            <div class="table-item">
+              <div class="table-physical-name">user</div>
+              <div class="table-logical-name">User</div>
+            </div>
+            <div class="table-item">
+              <div class="table-physical-name">user</div>
+              <div class="table-logical-name">User</div>
+            </div>
+            <div class="table-item">
+              <div class="table-physical-name">user</div>
+              <div class="table-logical-name">User</div>
+            </div>
+            <div class="table-item">
+              <div class="table-physical-name">user</div>
+              <div class="table-logical-name">User</div>
+            </div>
+            <div class="table-item">
+              <div class="table-physical-name">user</div>
+              <div class="table-logical-name">User</div>
+            </div>
+            <div class="table-item">
+              <div class="table-physical-name">user</div>
+              <div class="table-logical-name">User</div>
+            </div>
+            <div class="table-item">
+              <div class="table-physical-name">user</div>
+              <div class="table-logical-name">User</div>
+            </div>
+            <div class="table-item">
+              <div class="table-physical-name">user</div>
+              <div class="table-logical-name">User</div>
+            </div>
+            <div class="table-item">
+              <div class="table-physical-name">user</div>
+              <div class="table-logical-name">User</div>
+            </div>
+            <div class="table-item">
+              <div class="table-physical-name">user</div>
+              <div class="table-logical-name">User</div>
+            </div>
+            <div class="table-item">
+              <div class="table-physical-name">user</div>
+              <div class="table-logical-name">User</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- right pane -->
+      <div class="col-10 right-pane">
+        <!-- Editor Container -->
+        <div class="editor-container">
+
+          <!-- Editor Toolbar -->
+          <div class="editor-toolbar">
+            <div class="toolbar-left">
+              <button id="btn-history" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-clock-history"></i> History
+              </button>
+            </div>
+            <div class="toolbar-center">
+              <button id="btn-format" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-code"></i> Beautify SQL
+              </button>
+              <button id="btn-execute" class="btn btn-primary btn-sm">
+                <i class="bi bi-play-fill"></i> Run
+              </button>
+            </div>
+            <div class="toolbar-right">
+              <span class="me-2">Export</span>
+              <button id="btn-export-csv" class="btn btn-outline-success btn-sm me-1">CSV</button>
+              <button id="btn-export" class="btn btn-outline-success btn-sm">XLSX</button>
+            </div>
+          </div>
+
+          <!-- SQL Editor -->
+          <div class="sql-editor-container">
+            <div id="sql-editor"></div>
+          </div>
+
+        </div>
+
+        <!-- Result Container -->
+        <div class="result-container">
+          <!-- Results Tabs -->
+          <div class="results-tabs-container">
+            <button class="tab-nav-btn tab-nav-left" id="tab-nav-left">
+              <i class="bi bi-chevron-left"></i>
+            </button>
+            <div id="results-tabs" class="results-tabs">
+              <!-- Tabs will be generated by JavaScript -->
+            </div>
+            <button class="tab-nav-btn tab-nav-right" id="tab-nav-right">
+              <i class="bi bi-chevron-right"></i>
+            </button>
+          </div>
+
+          <!-- Results Grid -->
+          <div id="results-content" class="results-content">
+            <div class="p-4 text-center text-muted">
+              <i class="bi bi-database" style="font-size: 3rem; opacity: 0.3;"></i>
+              <p class="mt-3">execute_sql_message</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ag-grid/31.0.0/ag-grid-community.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <!-- Custom JavaScript -->
+  <script src="assets/app.js"></script>
+</body>
+</html>

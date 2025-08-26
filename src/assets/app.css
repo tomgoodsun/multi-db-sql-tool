@@ -1,0 +1,487 @@
+/* Multi-DB SQL Tool Styles */
+
+:root {
+  --primary-color: #0d6efd;
+  --secondary-color: #6c757d;
+  --success-color: #198754;
+  --danger-color: #dc3545;
+  --warning-color: #ffc107;
+  --info-color: #0dcaf0;
+  --light-color: #f8f9fa;
+  --dark-color: #212529;
+
+  --sidebar-width: 300px;
+  --header-height: 60px;
+  --editor-height: 60vh;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.app-container {
+  height: inherit;
+  overflow: hidden;
+}
+
+.app-content {
+  height: inherit;
+  overflow: hidden;
+}
+
+/* Header */
+.header {
+  align-items: center;
+  background: var(--dark-color);
+  border-bottom: 2px solid var(--primary-color);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  margin-left: calc(-.5 * var(--bs-gutter-x));
+  margin-right: calc(-.5 * var(--bs-gutter-x));
+  margin-top: calc(-1 * var(--bs-gutter-y));
+  padding: 1rem 1rem;
+}
+
+.header h1 {
+  font-size: 1.25rem;
+  margin: 0;
+  font-weight: 600;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.left-pane,
+.right-pane {
+  padding: 0;
+}
+
+/* Sidebar */
+.sidebar {
+  grid-area: sidebar;
+  background: var(--light-color);
+  border-right: 1px solid #dee2e6;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar-section {
+  padding: 0 0 1rem 0;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.sidebar-section h5 {
+  margin: 1rem 1rem 0.75rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--dark-color);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cluster-selector {
+  width: 100%;
+  font-size: 0.875rem;
+}
+
+.connection-status {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-indicator.connected {
+  background-color: var(--success-color);
+}
+
+.status-indicator.failed {
+  background-color: var(--danger-color);
+}
+
+.table-list {
+  /*max-height: 200px;*/
+  height: calc(100% - 200px);
+  overflow-y: auto;
+  font-size: 0.875rem;
+}
+
+.table-item {
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  border-bottom: 1px solid #e9ecef;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.table-item:hover {
+  background-color: rgba(13, 110, 253, 0.1);
+}
+
+.table-physical-name {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--dark-color);
+}
+
+.table-logical-name {
+  font-size: 0.75rem;
+  color: var(--secondary-color);
+  font-weight: normal;
+}
+
+/* Editor Area */
+.editor-area {
+  grid-area: editor;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid #dee2e6;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.editor-toolbar {
+  background: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.toolbar-left,
+.toolbar-center,
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toolbar-center {
+  flex: 1;
+  justify-content: center;
+}
+
+.editor-container {
+  height: 40%;
+}
+.result-container {
+  height: 60%;
+}
+
+
+
+
+
+
+.sql-editor-container {
+  flex: 1;
+  position: relative;
+  height: calc(100% - 50px);
+  border: 1px solid #ddd;
+}
+
+#sql-editor {
+  height: 100%;
+}
+
+.CodeMirror {
+  height: 100% !important;
+  width: 100% !important;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 12px;
+  border: none;
+  border-radius: 4px;
+}
+
+.CodeMirror-scroll {
+  height: 100% !important;
+  overflow: auto !important;
+}
+
+.CodeMirror-gutters {
+  border-right: 1px solid #ddd !important;
+}
+
+/*
+.CodeMirror-sizer {
+  min-height: 100% !important;
+}
+
+.CodeMirror-lines {
+  padding: 4px 0;
+}
+
+.CodeMirror-scrollbar-filler {
+  background-color: transparent;
+}
+*/
+
+/* Results Area */
+.results-area {
+  grid-area: results;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.results-tabs-container {
+  background: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.tab-nav-btn {
+  background: transparent;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  color: var(--secondary-color);
+  flex-shrink: 0;
+}
+
+.tab-nav-btn:hover {
+  background: rgba(13, 110, 253, 0.1);
+  color: var(--primary-color);
+}
+
+.tab-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.results-tabs {
+  flex: 1;
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.results-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.results-tab {
+  background: transparent;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  border-bottom: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.results-tab:hover {
+  background: rgba(13, 110, 253, 0.1);
+}
+
+.results-tab.active {
+  background: white;
+  border-bottom-color: var(--primary-color);
+  font-weight: 600;
+}
+
+.results-tab.error {
+  color: var(--danger-color);
+}
+
+.results-tab.error i {
+  color: var(--warning-color);
+}
+
+.results-tab:not(.error) i {
+  color: var(--success-color);
+}
+
+.results-content {
+  flex: 1;
+  overflow: hidden;
+}
+
+.tab-pane {
+  height: 100%;
+  display: none;
+  flex-direction: column;
+}
+
+.tab-pane.active {
+  display: flex;
+}
+
+.results-grid {
+  flex: 1;
+  overflow: auto;
+}
+
+/* AG Grid customization */
+.ag-theme-alpine {
+  --ag-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --ag-font-size: 13px;
+}
+
+.ag-header-cell-text {
+  font-weight: 600;
+}
+
+.shard-column {
+  background-color: #f8f9fa !important;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 0.5rem;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: auto;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+  padding: 1rem;
+  border-bottom: 1px solid #dee2e6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-body {
+  padding: 1rem;
+}
+
+.modal-footer {
+  padding: 1rem;
+  border-top: 1px solid #dee2e6;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+/* History list */
+.history-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.history-item {
+  padding: 0.75rem;
+  border-bottom: 1px solid #dee2e6;
+  cursor: pointer;
+}
+
+.history-item:hover {
+  background: #f8f9fa;
+}
+
+.history-item:last-child {
+  border-bottom: none;
+}
+
+.history-time {
+  font-size: 0.75rem;
+  color: var(--secondary-color);
+  margin-bottom: 0.25rem;
+}
+
+.history-sql {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* Utility classes */
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.text-muted {
+  color: var(--secondary-color) !important;
+}
+
+.text-success {
+  color: var(--success-color) !important;
+}
+
+.text-danger {
+  color: var(--danger-color) !important;
+}
+
+.d-none {
+  display: none !important;
+}
+
+.d-flex {
+  display: flex !important;
+}
+
+.align-items-center {
+  align-items: center !important;
+}
+
+.gap-1 {
+  gap: 0.25rem !important;
+}
+
+.gap-2 {
+  gap: 0.5rem !important;
+}
+
+/* Loading indicator */
+.loading {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
