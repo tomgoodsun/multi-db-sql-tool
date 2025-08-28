@@ -183,10 +183,10 @@ html, body {
 }
 
 .editor-container {
-  height: 40%;
+  height: 30%;
 }
 .result-container {
-  height: 60%;
+  height: 70%;
 }
 
 
@@ -334,8 +334,13 @@ html, body {
   display: flex;
 }
 
+.error-list {
+  border-bottom: 1px solid #dee2e6;
+  max-height: 150px;
+  overflow-y: auto;
+}
 .sql-error {
-  margin: 1rem;
+  margin: 0.5rem 1rem 0.5rem 1rem;
 }
 
 .results-grid {
