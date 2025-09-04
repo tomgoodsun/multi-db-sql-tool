@@ -1,0 +1,11 @@
+{
+  "require": {
+    "php": "^7.0",
+    "ext-json": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "MultiDbSqlTool\\": "src/classes/"
+    }
+  }
+}
