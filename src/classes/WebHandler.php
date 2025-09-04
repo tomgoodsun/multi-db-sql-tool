@@ -3,11 +3,22 @@ namespace MultiDbSqlTool;
 
 class WebHandler
 {
+    /**
+     * @var SessionManager
+     */
+    protected $sessionManager;
+
     protected $action = '';
+    protected $lang = '';
+    protected $clusterName = '';
 
     public function __construct()
     {
+        $this->sessionManager = new SessionManager();
+
         $this->action = $_REQUEST['action'] ?? '';
+        $this->lang = $_REQUEST['lang'] ?? '';
+        $this->clusterName = $_REQUEST['cluster'] ?? '';
     }
 
     protected function json(array $data)
@@ -24,18 +35,49 @@ class WebHandler
      */
     protected function processApiQuery()
     {
-        $data = [];
+        $resultSet = [];
         $sql = $_REQUEST['sql'] ?? '';
 
         $sqls = Utility::splitSqlStatements($sql);
 
+        $hasError = false;
         foreach ($sqls as $sql) {
-            $query = new Query($sql);
+            $result = [];
+            $error = null;
+            try {
+                $query = new Query($sql);
+                $query->bulkAddConnections(Config::getInstance()->getDatabaseSettings($this->clusterName));
+                $result = $query->query();
+                $this->sessionManager->addQueryHistory($sql);
+            } catch (\Exception $e) {
+                $error = $e->getMessage();
+                $hasError = true;
+            }
 
-            $data[] = $query->query();
+            $result += [
+                'error' => $error,
+                'results' => [],
+                'rows' => 0,
+                'sql' => $sql,
+            ];
+
+            $resultSet[] = $result;
         }
 
-        $this->json($data);
+        $this->json([
+            'cluster' => $this->clusterName,
+            'resultSet' => $resultSet,
+            'hasError' => $hasError
+        ]);
+    }
+
+    protected function processApiHistory()
+    {
+        $histories = $this->sessionManager->getQueryHistory();
+        $this->json([
+            'cluster' => $this->clusterName,
+            'histories' => $histories,
+        ]);
     }
 
     /**
@@ -45,6 +87,10 @@ class WebHandler
      */
     protected function processWeb()
     {
+        $optionalName = Config::getInstance()->get('optional_name', '');
+        $optionalName = $optionalName ? " for {$optionalName}" : '';
+        $clausterList = Config::getInstance()->getClusterNames();
+        $readOnlyMode = Config::getInstance()->get('readonly_mode', true);
         require_once __DIR__ . '/../assets/template/index.inc.html';
     }
 
@@ -55,13 +101,12 @@ class WebHandler
             case 'api_query':
                 $this->processApiQuery();
                 break;
+            case 'api_history':
+                $this->processApiHistory();
+                break;
             default:
                 $this->processWeb();
                 break;
         }
-    }
-
-    public function handleRequest($request) {
-        // Handle incoming web requests
     }
 }

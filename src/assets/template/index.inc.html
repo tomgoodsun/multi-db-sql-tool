@@ -26,7 +26,7 @@
   <div class="container-fluid app-container">
     <!-- header -->
     <div class="header">
-      <h1>Multi-DB SQL Tool</h1>
+      <h1>Multi-DB SQL Tool <span class="optional-name"><?php echo $optionalName; ?></span></h1>
 
       <div class="header-controls">
         <!-- Language Selector -->
@@ -36,12 +36,20 @@
         </select>
 
         <select id="cluster-selector" class="form-select form-select-sm me-2">
+          <?php
+            foreach ($clausterList as $clusterName) {
+              echo "<option value=\"{$clusterName}\">{$clusterName}</option>";
+            }
+          ?>
           <option value="">Cluster 1</option>
           <option value="">Cluster 2</option>
         </select>
 
+        <? if ($readOnlyMode): ?>
         <span class="badge bg-warning">Read Only</span>
+        <? else: ?>
         <span class="badge bg-danger">Write Enabled</span>
+        <? endif; ?>
     </div>
 
     </div>
@@ -298,10 +306,17 @@
   </div>
 
   <!-- JavaScript Libraries -->
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/ag-grid/31.0.0/ag-grid-community.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <script>
+    window.MultiDbSql = {
+      isReadOnlyMode: <?php echo $readOnlyMode ? 'true' : 'false'; ?>,
+    };
+  </script>
 
   <!-- Custom JavaScript -->
   <script src="assets/app.js"></script>
