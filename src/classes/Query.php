@@ -41,6 +41,20 @@ class Query
     }
 
     /**
+     * Add multiple database connections.
+     *
+     * @param array $connections
+     * @return $this
+     */
+    public function bulkAddConnections($connections)
+    {
+        foreach ($connections as $name => $conn) {
+            $this->addConnection($name, $conn['dsn'], $conn['username'], $conn['password']);
+        }
+        return $this;
+    }
+
+    /**
      * Add a database connection.
      *
      * @param string $name
