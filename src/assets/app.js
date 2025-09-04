@@ -102,7 +102,9 @@
   initResultsTabs();
   // ------------------------------------------------------------
 
-  let createResultGrid = (container, combinedData) =>{
+  let currentResults = {};
+
+  let createResultGrid = (container, combinedData) => {
     const gridDiv = document.createElement('div');
     gridDiv.className = 'results-grid ag-theme-alpine';
     container.appendChild(gridDiv);
@@ -130,119 +132,44 @@
     };
 
     new agGrid.Grid(gridDiv, gridOptions);
-
   };
 
-  createResultGrid(
-    document.getElementById('tab-1'),
-    [
-      {_shard: 'db1', id: 1, name: 'Alice'},
-      {_shard: 'db2', id: 2, name: 'Bob'},
-      {_shard: 'db1', id: 3, name: 'Charlie'},
-      {_shard: 'db2', id: 4, name: 'David'},
-      {_shard: 'db1', id: 5, name: 'Eve'},
-      {_shard: 'db2', id: 6, name: 'Frank'},
-      {_shard: 'db1', id: 7, name: 'Grace'},
-      {_shard: 'db2', id: 8, name: 'Hank'},
-      {_shard: 'db1', id: 9, name: 'Ivy'},
-      {_shard: 'db2', id: 10, name: 'Jack'},
-      {_shard: 'db1', id: 1, name: 'Alice'},
-      {_shard: 'db2', id: 2, name: 'Bob'},
-      {_shard: 'db1', id: 3, name: 'Charlie'},
-      {_shard: 'db2', id: 4, name: 'David'},
-      {_shard: 'db1', id: 5, name: 'Eve'},
-      {_shard: 'db2', id: 6, name: 'Frank'},
-      {_shard: 'db1', id: 7, name: 'Grace'},
-      {_shard: 'db2', id: 8, name: 'Hank'},
-      {_shard: 'db1', id: 9, name: 'Ivy'},
-      {_shard: 'db2', id: 10, name: 'Jack'},
-      {_shard: 'db1', id: 1, name: 'Alice'},
-      {_shard: 'db2', id: 2, name: 'Bob'},
-      {_shard: 'db1', id: 3, name: 'Charlie'},
-      {_shard: 'db2', id: 4, name: 'David'},
-      {_shard: 'db1', id: 5, name: 'Eve'},
-      {_shard: 'db2', id: 6, name: 'Frank'},
-      {_shard: 'db1', id: 7, name: 'Grace'},
-      {_shard: 'db2', id: 8, name: 'Hank'},
-      {_shard: 'db1', id: 9, name: 'Ivy'},
-      {_shard: 'db2', id: 10, name: 'Jack'}
-    ]
-  );
+  currentResults['query1'] = [
+    {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'},
+    {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' },
+    {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }, {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  },
+    {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'}, {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'},
+    {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' }, {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' },
+    {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'},
+    {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' },
+    {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }
+  ];
 
-  createResultGrid(
-    document.getElementById('tab-3'),
-    [
-      {_shard: 'db1', id: 1, name: 'Alice'},
-      {_shard: 'db2', id: 2, name: 'Bob'},
-      {_shard: 'db1', id: 3, name: 'Charlie'},
-      {_shard: 'db2', id: 4, name: 'David'},
-      {_shard: 'db1', id: 5, name: 'Eve'},
-      {_shard: 'db2', id: 6, name: 'Frank'},
-      {_shard: 'db1', id: 7, name: 'Grace'},
-      {_shard: 'db2', id: 8, name: 'Hank'},
-      {_shard: 'db1', id: 9, name: 'Ivy'},
-      {_shard: 'db2', id: 10, name: 'Jack'},
-      {_shard: 'db1', id: 1, name: 'Alice'},
-      {_shard: 'db2', id: 2, name: 'Bob'},
-      {_shard: 'db1', id: 3, name: 'Charlie'},
-      {_shard: 'db2', id: 4, name: 'David'},
-      {_shard: 'db1', id: 5, name: 'Eve'},
-      {_shard: 'db2', id: 6, name: 'Frank'},
-      {_shard: 'db1', id: 7, name: 'Grace'},
-      {_shard: 'db2', id: 8, name: 'Hank'},
-      {_shard: 'db1', id: 9, name: 'Ivy'},
-      {_shard: 'db2', id: 10, name: 'Jack'},
-      {_shard: 'db1', id: 1, name: 'Alice'},
-      {_shard: 'db2', id: 2, name: 'Bob'},
-      {_shard: 'db1', id: 3, name: 'Charlie'},
-      {_shard: 'db2', id: 4, name: 'David'},
-      {_shard: 'db1', id: 5, name: 'Eve'},
-      {_shard: 'db2', id: 6, name: 'Frank'},
-      {_shard: 'db1', id: 7, name: 'Grace'},
-      {_shard: 'db2', id: 8, name: 'Hank'},
-      {_shard: 'db1', id: 9, name: 'Ivy'},
-      {_shard: 'db2', id: 10, name: 'Jack'}
-    ]
-  );
+  currentResults['query2'] = [
+    {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'},
+    {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' },
+    {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }, {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  },
+    {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'}, {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'},
+    {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' }, {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' },
+    {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'},
+    {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' },
+    {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }
+  ];
 
-  createResultGrid(
-    document.getElementById('tab-4'),
-    [
-      {_shard: 'db1', id: 1, name: 'Alice'},
-      {_shard: 'db2', id: 2, name: 'Bob'},
-      {_shard: 'db1', id: 3, name: 'Charlie'},
-      {_shard: 'db2', id: 4, name: 'David'},
-      {_shard: 'db1', id: 5, name: 'Eve'},
-      {_shard: 'db2', id: 6, name: 'Frank'},
-      {_shard: 'db1', id: 7, name: 'Grace'},
-      {_shard: 'db2', id: 8, name: 'Hank'},
-      {_shard: 'db1', id: 9, name: 'Ivy'},
-      {_shard: 'db2', id: 10, name: 'Jack'},
-      {_shard: 'db1', id: 1, name: 'Alice'},
-      {_shard: 'db2', id: 2, name: 'Bob'},
-      {_shard: 'db1', id: 3, name: 'Charlie'},
-      {_shard: 'db2', id: 4, name: 'David'},
-      {_shard: 'db1', id: 5, name: 'Eve'},
-      {_shard: 'db2', id: 6, name: 'Frank'},
-      {_shard: 'db1', id: 7, name: 'Grace'},
-      {_shard: 'db2', id: 8, name: 'Hank'},
-      {_shard: 'db1', id: 9, name: 'Ivy'},
-      {_shard: 'db2', id: 10, name: 'Jack'},
-      {_shard: 'db1', id: 1, name: 'Alice'},
-      {_shard: 'db2', id: 2, name: 'Bob'},
-      {_shard: 'db1', id: 3, name: 'Charlie'},
-      {_shard: 'db2', id: 4, name: 'David'},
-      {_shard: 'db1', id: 5, name: 'Eve'},
-      {_shard: 'db2', id: 6, name: 'Frank'},
-      {_shard: 'db1', id: 7, name: 'Grace'},
-      {_shard: 'db2', id: 8, name: 'Hank'},
-      {_shard: 'db1', id: 9, name: 'Ivy'},
-      {_shard: 'db2', id: 10, name: 'Jack'}
-    ]
-  );
+  currentResults['query3'] = [
+    {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'},
+    {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' },
+    {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }, {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  },
+    {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'}, {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'},
+    {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' }, {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' },
+    {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'},
+    {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' },
+    {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }
+  ]
 
-
-
+  createResultGrid(document.getElementById('tab-1'), currentResults['query1']);
+  createResultGrid(document.getElementById('tab-3'), currentResults['query2']);
+  createResultGrid(document.getElementById('tab-4'), currentResults['query3']);
 
   // ------------------------------------------------------------
 
