@@ -48,7 +48,7 @@ class WebHandler
                 $query = new Query($sql);
                 $query->bulkAddConnections(Config::getInstance()->getDatabaseSettings($this->clusterName));
                 $result = $query->query();
-                $this->sessionManager->addQueryHistory($sql);
+                $this->sessionManager->addQueryHistory($sql, $this->clusterName);
             } catch (\Exception $e) {
                 $error = $e->getMessage();
                 $hasError = true;
@@ -80,6 +80,39 @@ class WebHandler
         ]);
     }
 
+    protected function processApiTableList()
+    {
+        $tables = [];
+        $error = null;
+        try {
+            $sql = 'SELECT table_name, table_comment FROM information_schema.tables WHERE table_schema = database();';
+            $query = new Query($sql);
+            $query->bulkAddConnections(Config::getInstance()->getDatabaseSettings($this->clusterName));
+            $result = $query->query();
+            foreach ($result['results'] as $item) {
+                $shard = $item['__shard'];
+                $tableName = $item['table_name'];
+
+                if (!isset($tables[$tableName])) {
+                    $tables[$tableName] = [
+                        'name' => $tableName,
+                        'comment' => $item['table_comment'],
+                        'databases' => [],
+                    ];
+                }
+                $tables[$tableName]['databases'][] = $shard;
+            }
+        } catch (\Exception $e) {
+            $error = $e->getMessage();
+        }
+
+        $this->json([
+            'cluster' => $this->clusterName,
+            'tables' => $tables,
+            'error' => $error,
+        ]);
+    }
+
     /**
      * Normal web request handler
      *
@@ -103,6 +136,9 @@ class WebHandler
                 break;
             case 'api_history':
                 $this->processApiHistory();
+                break;
+            case 'api_table_list':
+                $this->processApiTableList();
                 break;
             default:
                 $this->processWeb();
