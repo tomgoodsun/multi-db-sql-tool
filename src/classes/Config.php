@@ -87,4 +87,10 @@ class Config
     {
         return self::getInstance()->get("dbs.$clusterName", []);
     }
+
+    public static function getShardNames($clusterName)
+    {
+        $dbs = self::getDatabaseSettings($clusterName);
+        return array_keys($dbs);
+    }
 }
