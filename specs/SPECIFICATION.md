@@ -91,7 +91,10 @@ return [
 
 - Layout
   - Top is title area
-  - Left pane is selecting cluster and table lists with connection status
+  - Left pane has connection status
+  - Left pane has 2 tabs, table list and shard/database list
+  - Each item of table list shows physical name, logical name, and existence status on databases
+  - Database list is selective and only selected database will be target
   - Right upper pane is SQL editor with toolbar (Run, Beautify, History, Clear)
   - Right lower pane is results displayed in tabs
 - SQL editor displays line numbers and syntax highlighting
@@ -102,7 +105,7 @@ return [
 - 'Beautify' button formats and indents SQL queries
 - SQL statements are separated by semicolons and executed sequentially
 - Results are displayed in tabs with labels showing query number and row count
-- Tab labels format: 'Query 1 (10 rows)' or 'Query 1 (Error)'
+- Tab labels format: 'Query `{id}` (`{rows}`)', or 'Query 1 (10)'
 - First column of result tables shows shard/database name
 - Export functionality creates XLSX file with each tab as a separate worksheet
 - Status dialog shows:
@@ -110,7 +113,7 @@ return [
   - Table existence verification across shards
   - Query execution statistics
 - Error handling displays errors in dedicated tabs with detailed information
-- Responsive design supporting desktop and tablet views
+- No support for responsive design
 
 ## Security Considerations
 
