@@ -41,6 +41,7 @@ class WebHandler
         $sqls = Utility::splitSqlStatements($sql);
 
         $hasError = false;
+        $id = 1;
         foreach ($sqls as $sql) {
             $result = [];
             $error = null;
@@ -59,9 +60,11 @@ class WebHandler
                 'results' => [],
                 'rows' => 0,
                 'sql' => $sql,
+                'id' => $id,
             ];
 
             $resultSet[] = $result;
+            $id++;
         }
 
         $this->json([
@@ -80,23 +83,23 @@ class WebHandler
         ]);
     }
 
-    protected function processApiTableList()
+    protected function processApiInitialData()
     {
         $tables = [];
         $error = null;
         try {
-            $sql = 'SELECT table_name, table_comment FROM information_schema.tables WHERE table_schema = database();';
+            $sql = 'SELECT TABLE_NAME, TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = database();';
             $query = new Query($sql);
             $query->bulkAddConnections(Config::getInstance()->getDatabaseSettings($this->clusterName));
             $result = $query->query();
             foreach ($result['results'] as $item) {
                 $shard = $item['__shard'];
-                $tableName = $item['table_name'];
+                $tableName = $item['TABLE_NAME'];
 
                 if (!isset($tables[$tableName])) {
                     $tables[$tableName] = [
                         'name' => $tableName,
-                        'comment' => $item['table_comment'],
+                        'comment' => $item['TABLE_COMMENT'],
                         'databases' => [],
                     ];
                 }
@@ -106,8 +109,32 @@ class WebHandler
             $error = $e->getMessage();
         }
 
+        // TODO: Remove lines, because these are test data
+        $tables['introduced_user_profile_header'] = ['name' => 'introduced_user_profile_header', 'comment' => 'Introduced User Profile Header (Unique)', 'databases' => ['shard1', 'shard2', 'shard3']];
+        $tables['user11'] = ['name' => 'user11', 'comment' => 'User 11', 'databases' => ['shard1', 'shard2', 'shard3']];
+        $tables['user12'] = ['name' => 'user12', 'comment' => 'User 12', 'databases' => ['shard1', 'shard2', 'shard3']];
+        $tables['user13'] = ['name' => 'user13', 'comment' => 'User 13', 'databases' => ['shard1', 'shard2', 'shard3']];
+        $tables['user14'] = ['name' => 'user14', 'comment' => 'User 14', 'databases' => ['shard1', 'shard2', 'shard3']];
+        $tables['user15'] = ['name' => 'user15', 'comment' => 'User 15', 'databases' => ['shard1', 'shard2', 'shard3']];
+        $tables['user16'] = ['name' => 'user16', 'comment' => 'User 16', 'databases' => ['shard1', 'shard2', 'shard3']];
+        $tables['user17'] = ['name' => 'user17', 'comment' => 'User 17', 'databases' => ['shard1', 'shard2', 'shard3']];
+        $tables['user18'] = ['name' => 'user18', 'comment' => 'User 18', 'databases' => ['shard1', 'shard2', 'shard3']];
+        $tables['user19'] = ['name' => 'user19', 'comment' => 'User 19', 'databases' => ['shard1', 'shard2', 'shard3']];
+        $tables['user20'] = ['name' => 'user20', 'comment' => 'User 20', 'databases' => ['shard1', 'shard2', 'shard3']];
+        $tables['user21'] = ['name' => 'user21', 'comment' => 'User 21', 'databases' => ['shard1', 'shard2', 'shard3']];
+        $tables['user22'] = ['name' => 'user22', 'comment' => 'User 22', 'databases' => ['shard1', 'shard2', 'shard3']];
+        $tables['user23'] = ['name' => 'user23', 'comment' => 'User 23', 'databases' => ['shard1', 'shard2', 'shard3']];
+        $tables['user24'] = ['name' => 'user24', 'comment' => 'User 24', 'databases' => ['shard1', 'shard2', 'shard3']];
+        $tables['user25'] = ['name' => 'user25', 'comment' => 'User 25', 'databases' => ['shard1', 'shard2', 'shard3']];
+        $tables['user26'] = ['name' => 'user26', 'comment' => 'User 26', 'databases' => ['shard1', 'shard2', 'shard3']];
+        $tables['user27'] = ['name' => 'user27', 'comment' => 'User 27', 'databases' => ['shard1', 'shard2', 'shard3']];
+        $tables['user28'] = ['name' => 'user28', 'comment' => 'User 28', 'databases' => ['shard1', 'shard2', 'shard3']];
+        $tables['user29'] = ['name' => 'user29', 'comment' => 'User 29', 'databases' => ['shard1', 'shard2', 'shard3']];
+        $tables['user30'] = ['name' => 'user30', 'comment' => 'User 30', 'databases' => ['shard1', 'shard2', 'shard3']];
+
         $this->json([
             'cluster' => $this->clusterName,
+            'shard_list' => Config::getInstance()->getShardNames($this->clusterName),
             'tables' => $tables,
             'error' => $error,
         ]);
@@ -127,7 +154,6 @@ class WebHandler
         require_once __DIR__ . '/../assets/template/index.inc.html';
     }
 
-
     public function execute()
     {
         switch ($this->action) {
@@ -137,8 +163,8 @@ class WebHandler
             case 'api_history':
                 $this->processApiHistory();
                 break;
-            case 'api_table_list':
-                $this->processApiTableList();
+            case 'api_initial_data':
+                $this->processApiInitialData();
                 break;
             default:
                 $this->processWeb();
