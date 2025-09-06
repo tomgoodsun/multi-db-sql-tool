@@ -29,6 +29,11 @@ class Query
     protected $resultSet = [];
 
     /**
+     * @var string[]
+     */
+    protected $errors = [];
+
+    /**
      * Constructor
      *
      * @param string $sql
@@ -40,6 +45,17 @@ class Query
         $this->params = $params;
     }
 
+    public static function createDsn(array $conn)
+    {
+        $dsn = 'mysql:';
+        foreach (['host', 'port', 'dbname', 'charset'] as $key) {
+            if (array_key_exists($key, $conn)) {
+                $dsn .= "$key={$conn[$key]};";
+            }
+        }
+        return $dsn;
+    }
+
     /**
      * Add multiple database connections.
      *
@@ -49,7 +65,7 @@ class Query
     public function bulkAddConnections($connections)
     {
         foreach ($connections as $name => $conn) {
-            $this->addConnection($name, $conn['dsn'], $conn['username'], $conn['password']);
+            $this->addConnection($name, self::createDsn($conn), $conn['username'], $conn['password']);
         }
         return $this;
     }
@@ -80,20 +96,28 @@ class Query
         $this->resultSet = [];
         $results = [];
         foreach ($this->connections as $name => $connection) {
-            $stmt = $connection->prepare($this->sql);
-            $stmt->execute($this->params);
-            $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            foreach ($result as &$row) {
-                $row['_shard'] = $name;
-                $results[] = $row['_shard'];
+            try {
+                $stmt = $connection->prepare($this->sql);
+                $stmt->execute($this->params);
+                $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+                foreach ($result as &$row) {
+                    $row['__shard'] = $name;
+                    $results[] = $row;
+                }
+                $this->resultSet[$name] = $result;
+                $this->rowCounts[$name] = count($result);
+            } catch (\Throwable $e) {
+                $this->errors[] = [
+                    'shard' => $name,
+                    'message' => $e->getMessage()
+                ];
             }
-            $this->resultSet[$name] = $result;
-            $this->rowCounts[$name] = count($result);
         }
 
         return [
             'rows' => array_sum($this->rowCounts),
             'results' => $results,
+            'errors' => $this->errors,
         ];
     }
 }
