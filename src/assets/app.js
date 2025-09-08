@@ -106,9 +106,8 @@
     rightBtn.disabled = scrollLeft >= scrollWidth - clientWidth - 1;
   };
 
-
-
   initResultsTabs();
+
   // ------------------------------------------------------------
 
   let currentResults = {};
@@ -142,42 +141,6 @@
 
     new agGrid.Grid(gridDiv, gridOptions);
   };
-
-  //// TODO: Remove lines, because these are test data
-  //currentResults['query1'] = [
-  //  {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'},
-  //  {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' },
-  //  {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }, {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  },
-  //  {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'}, {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'},
-  //  {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' }, {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' },
-  //  {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'},
-  //  {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' },
-  //  {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }
-  //];
-  //currentResults['query2'] = [
-  //  {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'},
-  //  {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' },
-  //  {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }, {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  },
-  //  {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'}, {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'},
-  //  {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' }, {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' },
-  //  {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'},
-  //  {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' },
-  //  {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }
-  //];
-  //currentResults['query3'] = [
-  //  {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'},
-  //  {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' },
-  //  {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }, {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  },
-  //  {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'}, {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'},
-  //  {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' }, {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' },
-  //  {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'},
-  //  {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' },
-  //  {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }
-  //]
-
-  //createResultGrid(document.getElementById('tab-1'), currentResults['query1']);
-  //createResultGrid(document.getElementById('tab-3'), currentResults['query2']);
-  //createResultGrid(document.getElementById('tab-4'), currentResults['query3']);
 
   let renderResults = (response) => {
     let tabArea = document.getElementById('results-tabs');
@@ -250,6 +213,7 @@
     activateTab('tab-1');
   };
 
+  // TODO: Remove this test data in production
   let testResults = {
     'cluster': getCurrentCluster(),
     'resultSet': [
@@ -336,6 +300,7 @@
         console.error("Error fetching cluster settings:", error);
       });
   };
+
   initialize();
 
   // ------------------------------------------------------------
@@ -352,6 +317,7 @@
 
     setTimeout(adjustStyles, 100);
   };
+
   adjustStyles();
   // ------------------------------------------------------------
 
