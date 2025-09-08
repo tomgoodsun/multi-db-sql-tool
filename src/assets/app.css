@@ -274,6 +274,7 @@ html, body {
   opacity: 0.3;
 }
 
+.sidebar-tabs,
 .results-tabs {
   display: flex;
   flex: 1;
@@ -286,6 +287,7 @@ html, body {
   display: none;
 }
 
+.sidebar-tab,
 .results-tab {
   align-items: center;
   background: transparent;
@@ -299,10 +301,12 @@ html, body {
   white-space: nowrap;
 }
 
+.sidebar-tab:hover,
 .results-tab:hover {
   background: rgba(13, 110, 253, 0.1);
 }
 
+.sidebar-tab.active,
 .results-tab.active {
   background: white;
   border-bottom-color: var(--primary-color);

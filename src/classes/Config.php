@@ -83,9 +83,19 @@ class Config
      * @param string $clusterName
      * @return array
      */
-    public static function getDatabaseSettings($clusterName)
+    public static function getDatabaseSettings($clusterName, array $targetShards = [])
     {
-        return self::getInstance()->get("dbs.$clusterName", []);
+        $dbSettings = self::getInstance()->get("dbs.$clusterName", []);
+        if (empty($targetShards)) {
+            return $dbSettings;
+        }
+        $result = [];
+        foreach ($targetShards as $shard) {
+            if (array_key_exists($shard, $dbSettings)) {
+                $result[$shard] = $dbSettings[$shard];
+            }
+        }
+        return $result;
     }
 
     public static function getShardNames($clusterName)

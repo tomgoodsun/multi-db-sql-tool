@@ -1,9 +1,21 @@
 (function(window, document) {
+  let dbSelector = document.getElementById('db-selector');
 
   let getCurrentCluster = () => {
     let clusterName = document.getElementById('cluster-selector').value;
     console.log('Selected cluster:', clusterName);
     return clusterName;
+  };
+
+  let getTargetShards = () => {
+    let selectedDbs = [];
+    dbSelector.querySelectorAll('option').forEach(el => {
+      if (el.selected) {
+        selectedDbs.push(el.value);
+      }
+    });
+    console.log('Selected DBs:', selectedDbs);
+    return selectedDbs;
   };
 
   // ------------------------------------------------------------
@@ -59,7 +71,12 @@
       let postData = new FormData();
       postData.append('action', 'api_query');
       postData.append('cluster', getCurrentCluster());
+      getTargetShards().forEach(db => {
+        console.log(db);
+        postData.append('shards[]', db);
+      });
       postData.append('sql', sql);
+      console.log(postData);
 
       fetch('', {
         method: 'POST',
@@ -123,7 +140,7 @@
     document.querySelectorAll('#results-tabs .results-tab').forEach(btn => {
       btn.addEventListener('click', evt => {
         let targetId = evt.target.dataset.target;
-        activateTab(targetId);
+        activateResultTab(targetId);
       });
     });
 
@@ -132,9 +149,27 @@
     updateTabNavigation();
   };
 
-  let activateTab = (targetId) => {
+  let activateResultTab = (targetId) => {
+    activateTab(targetId, '#results-tabs .results-tab', '#results-content .tab-pane');
+  };
+
+  let initSidebarTabs = () => {
+    document.querySelectorAll('#sidebar-tabs .sidebar-tab').forEach(btn => {
+      btn.addEventListener('click', evt => {
+        let targetId = evt.target.dataset.target;
+        activateSidebarTab(targetId);
+      });
+    });
+    activateSidebarTab('stab-1');
+  };
+
+  let activateSidebarTab = (targetId) => {
+    activateTab(targetId, '#sidebar-tabs .sidebar-tab', '#sidebar-content .tab-pane');
+  };
+
+  let activateTab = (targetId, tabCssSelector, tabContentSelector) => {
     // Tab
-    document.querySelectorAll('#results-tabs .results-tab').forEach(tab => {
+    document.querySelectorAll(tabCssSelector).forEach(tab => {
       tab.classList.remove('active');
       if (tab.dataset.target === targetId) {
         tab.classList.add('active');
@@ -142,7 +177,7 @@
     });
 
     // Tab panel
-    document.querySelectorAll('.tab-pane').forEach(pane => {
+    document.querySelectorAll(tabContentSelector).forEach(pane => {
       pane.classList.remove('active');
       if (pane.id === targetId) {
         pane.classList.add('active');
@@ -190,6 +225,7 @@
   };
 
   initResultsTabs();
+  initSidebarTabs();
 
   // ------------------------------------------------------------
 
@@ -259,7 +295,7 @@
       tabBtn.setAttribute('role', 'tab');
       tabBtn.addEventListener('click', evt => {
         let targetId = evt.target.dataset.target;
-        activateTab(targetId);
+        activateResultTab(targetId);
       });
       tabArea.appendChild(tabBtn);
 
@@ -291,7 +327,7 @@
       }
       createResultGrid(tabPane, results);
     });
-    activateTab('tab-1');
+    activateResultTab('tab-1');
   };
 
   // TODO: Remove this test data in production
@@ -376,6 +412,15 @@
           itemDiv.appendChild(logicalDiv);
           elem.appendChild(itemDiv);
         };
+
+        dbSelector.innerHTML = '';
+        data.shardList.forEach((db, i) => {
+          let option = document.createElement('option');
+          option.value = db;
+          option.innerHTML = db;
+          option.setAttribute('selected', true);
+          dbSelector.appendChild(option);
+        });
       })
       .catch(error => {
         console.error('Error fetching cluster settings:', error);
@@ -387,7 +432,7 @@
   // ------------------------------------------------------------
 
   let adjustStyles = () => {
-    document.querySelectorAll('.table-list').forEach(el => {
+    document.querySelectorAll('.table-list, #db-selector').forEach(el => {
       el.style.height = (window.innerHeight - el.offsetTop) + 'px';
     });
 
@@ -395,6 +440,13 @@
       el.style.height = (window.innerHeight - el.offsetTop) + 'px';
     });
 
+    let selectedDbCount = 0;
+    dbSelector.querySelectorAll('option').forEach(el => {
+      if (el.selected) {
+        selectedDbCount++;
+      }
+    });
+    document.getElementById('db-count').innerHTML = selectedDbCount;
 
     setTimeout(adjustStyles, 100);
   };

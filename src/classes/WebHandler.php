@@ -42,6 +42,7 @@ class WebHandler
     protected function processApiQuery()
     {
         $resultSet = [];
+        $targetShards = $_REQUEST['shards'] ?? [];
         $sql = $_REQUEST['sql'] ?? '';
 
         $sqls = Utility::splitSqlStatements($sql);
@@ -52,8 +53,9 @@ class WebHandler
             $result = [];
             $error = null;
             try {
+                $dbSettings = Config::getInstance()->getDatabaseSettings($this->clusterName, $targetShards);
                 $query = new Query($sql);
-                $query->bulkAddConnections(Config::getInstance()->getDatabaseSettings($this->clusterName));
+                $query->bulkAddConnections($dbSettings);
                 $result = $query->query();
                 $this->sessionManager->addQueryHistory($sql, $this->clusterName);
             } catch (\Throwable $e) {
@@ -150,7 +152,7 @@ class WebHandler
 
         $this->json([
             'cluster' => $this->clusterName,
-            'shard_list' => Config::getInstance()->getShardNames($this->clusterName),
+            'shardList' => Config::getInstance()->getShardNames($this->clusterName),
             'tables' => $tables,
             'error' => $error,
         ]);
