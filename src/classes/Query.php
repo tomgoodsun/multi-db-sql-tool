@@ -86,6 +86,27 @@ class Query
     }
 
     /**
+     * Format the result set for a specific shard.
+     *
+     * @param string $shardName
+     * @param array $result
+     * @param array $results
+     * @return void
+     */
+    public static function formatResult($shardName, array $result, array &$results)
+    {
+        foreach ($result as &$row) {
+            $tmp = [];
+            $tmp['__shard'] = $shardName;
+            foreach ($row as $k => $v) {
+                $tmp[$k] = $v;
+            }
+            $results[] = $tmp;
+        }
+        return $result;
+    }
+
+    /**
      * Execute the query and return the results.
      *
      * @return array
@@ -100,14 +121,11 @@ class Query
                 $stmt = $connection->prepare($this->sql);
                 $stmt->execute($this->params);
                 $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-                foreach ($result as &$row) {
-                    $row['__shard'] = $name;
-                    $results[] = $row;
-                }
+                $result = self::formatResult($name, $result, $results);
                 $this->resultSet[$name] = $result;
                 $this->rowCounts[$name] = count($result);
             } catch (\Throwable $e) {
-                $this->errors[] = [
+                $this->errors[$name] = [
                     'shard' => $name,
                     'message' => $e->getMessage()
                 ];
@@ -117,7 +135,7 @@ class Query
         return [
             'rows' => array_sum($this->rowCounts),
             'results' => $results,
-            'errors' => $this->errors,
+            'errors' => array_values($this->errors),
         ];
     }
 }

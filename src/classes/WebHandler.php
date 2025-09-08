@@ -21,6 +21,12 @@ class WebHandler
         $this->clusterName = $_REQUEST['cluster'] ?? '';
     }
 
+    /**
+     * Output JSON and exit
+     *
+     * @param array $data
+     * @return void
+     */
     protected function json(array $data)
     {
         header('Content-Type: application/json');
@@ -29,7 +35,7 @@ class WebHandler
     }
 
     /**
-     * Api
+     * API: Execute SQL query
      *
      * @return void
      */
@@ -50,7 +56,7 @@ class WebHandler
                 $query->bulkAddConnections(Config::getInstance()->getDatabaseSettings($this->clusterName));
                 $result = $query->query();
                 $this->sessionManager->addQueryHistory($sql, $this->clusterName);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $error = $e->getMessage();
                 $hasError = true;
             }
@@ -74,6 +80,11 @@ class WebHandler
         ]);
     }
 
+    /**
+     * API: Get query history
+     *
+     * @return void
+     */
     protected function processApiHistory()
     {
         $histories = $this->sessionManager->getQueryHistory();
@@ -83,6 +94,11 @@ class WebHandler
         ]);
     }
 
+    /**
+     * API: Get initial data
+     *
+     * @return void
+     */
     protected function processApiInitialData()
     {
         $tables = [];
@@ -154,6 +170,11 @@ class WebHandler
         require_once __DIR__ . '/../assets/template/index.inc.html';
     }
 
+    /**
+     * Main execution function
+     *
+     * @return void
+     */
     public function execute()
     {
         switch ($this->action) {
