@@ -46,9 +46,9 @@
         </select>
 
         <? if ($readOnlyMode): ?>
-        <span class="badge bg-warning">Read Only</span>
+        <span class="badge bg-warning mode-name">Read Only</span>
         <? else: ?>
-        <span class="badge bg-danger">Write Enabled</span>
+        <span class="badge bg-danger mode-name">Write Enabled</span>
         <? endif; ?>
     </div>
 
@@ -206,6 +206,7 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/ag-grid/31.0.0/ag-grid-community.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/sql-formatter@15.6.8/dist/sql-formatter.min.js"></script>
 
   <script>
     window.MultiDbSql = {

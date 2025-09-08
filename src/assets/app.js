@@ -2,16 +2,99 @@
 
   let getCurrentCluster = () => {
     let clusterName = document.getElementById('cluster-selector').value;
-    console.log("Selected cluster:", clusterName);
+    console.log('Selected cluster:', clusterName);
     return clusterName;
   };
 
   // ------------------------------------------------------------
 
-  let editorElement = document.getElementById("sql-editor")
+  let currentResults = {};
+  let editorElement = document.getElementById('sql-editor')
   let sqlEditor = null;
+  let isExecuting = false;
 
+  /**
+   * Format the SQL query in the editor using sql-formatter library.
+   *
+   * @returns {void}
+   */
+  let formatQuery = () => {
+    let sql = sqlEditor.getValue().trim();
+    if (!sql) {
+      return;
+    }
+
+    sql = sqlFormatter.format(sql);
+    sqlEditor.setValue(sql);
+  };
+
+  /**
+   * Execute the SQL query in the editor.
+   *
+   * @returns {void}
+   */
+  let executeQuery = async () => {
+    if (isExecuting) {
+      return;
+    }
+
+    let sql = sqlEditor.getValue().trim();
+    if (!sql) {
+      // TODO
+      //window.alert(this.t('enter_sql_query'), 'warning');
+      return;
+    }
+
+    // TODO
+    // SQL実行前の警告ダイアログ
+    //const confirmed = await this.showExecutionWarning(sql);
+    //if (!confirmed) {
+    //  return;
+    //}
+
+    isExecuting = true;
+
+    try {
+      // POST / API call to execute SQL
+      let postData = new FormData();
+      postData.append('action', 'api_query');
+      postData.append('cluster', getCurrentCluster());
+      postData.append('sql', sql);
+
+      fetch('', {
+        method: 'POST',
+        body: postData
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Query response:', data);
+        if (data.hasError) {
+          console.error('Query execution error:', data.error);
+        }
+        currentResults = data;
+        renderResults(data);
+      })
+      .catch(error => {
+        console.error('Error executing query:', error);
+      })
+      .finally(() => {
+        isExecuting = false;
+      });
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      isExecuting = false;
+    }
+  };
+
+  /**
+   * Initialize CodeMirror editor and bind buttons.
+   *
+   * @returns {void}
+   */
   let initCodeMirror = () => {
+    document.getElementById('btn-format')?.addEventListener('click', () => formatQuery());
+    document.getElementById('btn-execute')?.addEventListener('click', () => executeQuery());
+
     // Initialize CodeMirror
     sqlEditor = CodeMirror(editorElement, {
       mode: 'text/x-mysql',
@@ -22,10 +105,10 @@
       lineWrapping: false,
       //viewportMargin: Infinity,
       extraKeys: {
-        "Ctrl-Enter": () => {
-          //this.executeQuery();
+        'Ctrl-Enter': () => {
+          executeQuery();
         },
-        "Ctrl-Space": "autocomplete"
+        'Ctrl-Space': 'autocomplete'
       },
       value: ''
     });
@@ -109,8 +192,6 @@
   initResultsTabs();
 
   // ------------------------------------------------------------
-
-  let currentResults = {};
 
   let createResultGrid = (container, combinedData) => {
     const gridDiv = document.createElement('div');
@@ -297,7 +378,7 @@
         };
       })
       .catch(error => {
-        console.error("Error fetching cluster settings:", error);
+        console.error('Error fetching cluster settings:', error);
       });
   };
 

@@ -189,8 +189,10 @@ html, body {
   height: 70%;
 }
 
-
-
+.mode-name {
+  height: 2.5em;
+  line-height: 1.5em;
+}
 
 
 
