@@ -300,6 +300,10 @@ html, body {
   padding: 0.5rem 1rem;
   white-space: nowrap;
 }
+.sidebar-tab {
+  text-align: center;
+  width: 50%;
+}
 
 .sidebar-tab:hover,
 .results-tab:hover {
