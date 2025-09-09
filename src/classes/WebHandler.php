@@ -8,6 +8,7 @@ class WebHandler
      */
     protected $sessionManager;
 
+    protected $method = '';
     protected $action = '';
     protected $lang = '';
     protected $clusterName = '';
@@ -16,9 +17,20 @@ class WebHandler
     {
         $this->sessionManager = new SessionManager();
 
+        $this->method = $_SERVER['REQUEST_METHOD'] ?? '';
         $this->action = $_REQUEST['action'] ?? '';
         $this->lang = $_REQUEST['lang'] ?? '';
         $this->clusterName = $_REQUEST['cluster'] ?? '';
+    }
+
+    /**
+     * Check if the request method is POST
+     *
+     * @return boolean
+     */
+    protected function isPostMethod()
+    {
+        return strtoupper($this->method) === 'POST';
     }
 
     /**
@@ -41,6 +53,11 @@ class WebHandler
      */
     protected function processApiQuery()
     {
+        if (!$this->isPostMethod()) {
+            http_response_code(405);
+            $this->json(['error' => 'Method Not Allowed']);
+        }
+
         $resultSet = [];
         $targetShards = $_REQUEST['shards'] ?? [];
         $sql = $_REQUEST['sql'] ?? '';

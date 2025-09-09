@@ -94,25 +94,23 @@
       postData.append('sql', sql);
       console.log(postData);
 
-      fetch('', {
-        method: 'POST',
-        body: postData
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Query response:', data);
-        if (data.hasError) {
-          console.error('Query execution error:', data.error);
-        }
-        currentResults = data;
-        renderResults(data);
-      })
-      .catch(error => {
-        console.error('Error executing query:', error);
-      })
-      .finally(() => {
-        isExecuting = false;
-      });
+      // This API call must user POST method to avoid URL length limit
+      fetch('', {method: 'POST', body: postData})
+        .then(response => response.json())
+        .then(data => {
+          console.log('Query response:', data);
+          if (data.hasError) {
+            console.error('Query execution error:', data.error);
+          }
+          currentResults = data;
+          renderResults(data);
+        })
+        .catch(error => {
+          console.error('Error executing query:', error);
+        })
+        .finally(() => {
+          isExecuting = false;
+        });
     } catch (error) {
       console.error('Unexpected error:', error);
       isExecuting = false;
@@ -170,6 +168,9 @@
    * @returns {void}
    */
   let createHistoryContent = () => {
+    //let postData = new FormData();
+    //postData.append('action', 'api_history');
+    //fetch('', {method: 'POST', body: postData})
     fetch('?action=api_history')
       .then(response => response.json())
       .then(data => {
@@ -656,7 +657,10 @@
   let initialize = () => {
     let clusterName = getCurrentCluster();
 
-    // Load cluster settings via AJAX
+    //let postData = new FormData();
+    //postData.append('action', 'api_initial_data');
+    //postData.append('cluster', clusterName);
+    //fetch('', {method: 'POST', body: postData})
     fetch(`?action=api_initial_data&cluster=${encodeURIComponent(clusterName)}`)
       .then(response => response.json())
       .then(data => {
