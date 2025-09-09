@@ -91,7 +91,7 @@ class WebHandler
     {
         $histories = $this->sessionManager->getQueryHistory();
         $this->json([
-            'cluster' => $this->clusterName,
+            //'cluster' => $this->clusterName,
             'histories' => $histories,
         ]);
     }

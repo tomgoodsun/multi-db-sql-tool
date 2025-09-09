@@ -24,7 +24,10 @@
   let editorElement = document.getElementById('sql-editor')
   let sqlEditor = null;
   let isExecuting = false;
+  let sqlExecutionDialogElem = document.getElementById('execution-confirm');
   let sqlExecutionDialog = null;
+  let historyDialogElem = document.getElementById('sql-history');
+  let historyDialog = null;
 
   /**
    * Format the SQL query in the editor using sql-formatter library.
@@ -118,15 +121,13 @@
    * @returns {void}
    */
   let initSqlEditor = () => {
-    let modalEl = document.getElementById('execution-confirm');
-    sqlExecutionDialog = new bootstrap.Modal(modalEl, {
-      backdrop: 'static',
-      keyboard: false
-    });
+    sqlExecutionDialog = new bootstrap.Modal(sqlExecutionDialogElem, {backdrop: 'static', keyboard: false});
+    historyDialog = new bootstrap.Modal(historyDialogElem, {backdrop: 'static', keyboard: false});
 
     document.getElementById('btn-format')?.addEventListener('click', () => formatQuery());
     document.getElementById('btn-execute')?.addEventListener('click', () => confirmSqlExecution());
-    document.getElementById('btn-confirm-execute').addEventListener('click', () => executeQuery());
+    document.getElementById('btn-confirm-execute')?.addEventListener('click', () => executeQuery());
+    document.getElementById('btn-history')?.addEventListener('click', () => createHistoryContent());
 
     // Initialize CodeMirror
     sqlEditor = CodeMirror(editorElement, {
@@ -148,18 +149,60 @@
     sqlEditor.setSize('100%', '100%');
   };
 
-  let getHistory = async () => {
-    let history = await fetch('?action=api_history')
+  /**
+   * Create history content
+   */
+  let createHistoryContent = () => {
+    fetch('?action=api_history')
       .then(response => response.json())
       .then(data => {
-        return data;
-      });
-      console.log('History data:', history);
-  };
-  //getHistory();
+        // data = {
+        //   "histories": [
+        //     {"cluster": "development_cluster", "sql": "select * from users", "timestamp": 1757430299, "formattedTime": "2025-09-09T15:04:59+00:00"}
+        //   ]
+        // }
 
-  let executeHistory = () => {
-    // TODO: Implement history execution
+        console.log('History result:', data);
+
+        let container = document.createElement('div');
+
+        if (data.histories.length === 0) {
+          container.innerHTML = '<p class="text-muted">No query history available.</p>';
+          return container;
+        }
+
+        let historyList = document.createElement('div');
+        historyList.className = 'history-list';
+
+        data.histories.forEach((item) => {
+          let historyItem = document.createElement('div');
+          historyItem.className = 'history-item';
+          historyItem.addEventListener('click', () => {
+            sqlEditor.setValue(item.sql);
+            historyDialog.hide();
+          });
+
+          let timeDiv = document.createElement('div');
+          timeDiv.className = 'history-time';
+          timeDiv.textContent = item.formattedTime + ' @' + item.cluster;
+
+          let sqlDiv = document.createElement('div');
+          sqlDiv.className = 'history-sql';
+          sqlDiv.textContent = item.sql.length > 100 ? item.sql.substring(0, 100) + '...' : item.sql;
+
+          historyItem.appendChild(timeDiv);
+          historyItem.appendChild(sqlDiv);
+          historyList.appendChild(historyItem);
+        });
+
+        container.appendChild(historyList);
+        historyDialogElem.querySelector('.modal-body').innerHTML = '';
+        historyDialogElem.querySelector('.modal-body').appendChild(container);
+        historyDialog.show();
+      })
+      .catch(error => {
+        console.error('Error fetching history:', error);
+      });
   };
 
   initSqlEditor();

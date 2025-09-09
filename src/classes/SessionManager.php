@@ -46,7 +46,7 @@ class SessionManager
             'cluster' => $clusterName,
             'sql' => $sql,
             'timestamp' => time(),
-            'formatted_time' => date(DATE_W3C),
+            'formattedTime' => date(DATE_W3C),
         ];
 
         // 重複チェック（直前の履歴と同じ場合は追加しない）
