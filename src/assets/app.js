@@ -55,6 +55,87 @@
   };
 
   /**
+   * Split SQL statements by semicolon.
+   *
+   * @param {string} sql
+   * @returns {Array<string>}
+   */
+  let splitSql = (sql) => {
+    // Simple split by semicolon, ignoring semicolons in quotes
+    let sqls = [];
+    let currentStatement = '';
+    let inSingleQuote = false;
+    let inDoubleQuote = false;
+    let inBacktick = false;
+    for (let char of sql) {
+      if (char === "'" && !inDoubleQuote && !inBacktick) {
+        inSingleQuote = !inSingleQuote;
+      } else if (char === '"' && !inSingleQuote && !inBacktick) {
+        inDoubleQuote = !inDoubleQuote;
+      } else if (char === '`' && !inSingleQuote && !inDoubleQuote) {
+        inBacktick = !inBacktick;
+      }
+      if (char === ';' && !inSingleQuote && !inDoubleQuote && !inBacktick) {
+        if (currentStatement.trim()) {
+          sqls.push(currentStatement.trim());
+          currentStatement = '';
+        }
+      } else {
+        currentStatement += char;
+      }
+    }
+    if (currentStatement.trim()) {
+      sqls.push(currentStatement.trim());
+    }
+    return sqls;
+  };
+
+  /**
+   * Clean the SQL query by removing comments and extra whitespace.
+   *
+   * @param {string} sql
+   * @returns {string}
+   */
+  let cleanSql = (sql) => {
+    // Remove comments and trim
+    return sql.replace(/--.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '').trim();
+  };
+
+  /**
+   * Check if the SQL query is a reading query (SELECT, SHOW, DESC, DESCRIBE).
+   *
+   * @param {string} sql
+   * @returns {boolean}
+   */
+  let isReadOnlyQuery = (sql) => {
+    // Check if the SQL query is a SELECT, SHOW, DESC, DESCRIBE statement
+    sql = cleanSql(sql);
+    sql = sql.trim().toUpperCase();
+    sql = sql.replace(/^[\s\(]+/, ''); // Remove leading spaces and parentheses
+    return sql.startsWith('SELECT')
+      || sql.startsWith('SHOW')
+      || sql.startsWith('DESC')
+      || sql.startsWith('DESCRIBE');
+  };
+
+  /**
+   * Check if the SQL query can be executed (not read-only).
+   *
+   * @param {string} sql
+   * @returns {boolean}
+   */
+  let canExecuteQuery = (sql) => {
+    if (!window.MultiDbSql.isReadOnlyMode) {
+      return true;
+    }
+    let sqls = splitSql(sql);
+    if (sqls.length === 0) {
+      return false;
+    }
+    return sqls.every(stmt => !isReadOnlyQuery(stmt));
+  };
+
+  /**
    * Execute the SQL query in the editor.
    *
    * @returns {void}

@@ -103,4 +103,14 @@ class Config
         $dbs = self::getDatabaseSettings($clusterName);
         return array_keys($dbs);
     }
+
+    /**
+     * Check if the application is in read-only mode.
+     *
+     * @return bool
+     */
+    public static function isReadOnlyMode()
+    {
+        return (bool)self::getInstance()->get('read_only_mode', false);
+    }
 }
