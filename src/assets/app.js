@@ -73,13 +73,6 @@
       return;
     }
 
-    // TODO
-    // SQL実行前の警告ダイアログ
-    //const confirmed = await this.showExecutionWarning(sql);
-    //if (!confirmed) {
-    //  return;
-    //}
-
     isExecuting = true;
 
     try {
@@ -168,12 +161,10 @@
    * @returns {void}
    */
   let createHistoryContent = () => {
-    //let postData = new FormData();
-    //postData.append('action', 'api_history');
-    //fetch('', {method: 'POST', body: postData})
     fetch('?action=api_history')
       .then(response => response.json())
       .then(data => {
+        // TODO: Test data
         // data = {
         //   "histories": [
         //     {"cluster": "development_cluster", "sql": "select * from users", "timestamp": 1757430299, "formattedTime": "2025-09-09T15:04:59+00:00"}
@@ -469,7 +460,7 @@
     activateResultTab('tab-1');
   };
 
-  //// TODO: Remove this test data in production
+  // TODO: Remove this test data in production
   //let testResults = {
   //  'cluster': getCurrentCluster(),
   //  'resultSet': [
@@ -483,21 +474,8 @@
   //      ]
   //    },
   //    {
-  //      'id': 2, 'errors': [{'shard': 'db1', 'message': 'error message example'}], 'rows': 0, 'sql': 'select * from user1;',
-  //      'results': [
-  //        {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'}, {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' },
-  //        {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }, {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'}, {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'},
-  //        {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' }, {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }, {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'},
-  //        {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' }, {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }
-  //      ],
-  //    },
-  //    {
   //      'id': 3,
   //      'errors': [
-  //        {'shard': 'db1', 'message': 'error message example'},
-  //        {'shard': 'db1', 'message': 'error message example'},
-  //        {'shard': 'db1', 'message': 'error message example'},
-  //        {'shard': 'db1', 'message': 'error message example'},
   //        {'shard': 'db1', 'message': 'error message example'},
   //        {'shard': 'db1', 'message': 'error message example'}
   //      ],
@@ -509,12 +487,6 @@
   //        {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' }, {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }
   //      ],
   //    },
-  //    //{'id': 4, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
-  //    //{'id': 5, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
-  //    //{'id': 6, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
-  //    //{'id': 7, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
-  //    //{'id': 8, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
-  //    //{'id': 9, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
   //    {'id': 10, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]}
   //  ],
   //  'hasError': false
@@ -657,10 +629,6 @@
   let initialize = () => {
     let clusterName = getCurrentCluster();
 
-    //let postData = new FormData();
-    //postData.append('action', 'api_initial_data');
-    //postData.append('cluster', clusterName);
-    //fetch('', {method: 'POST', body: postData})
     fetch(`?action=api_initial_data&cluster=${encodeURIComponent(clusterName)}`)
       .then(response => response.json())
       .then(data => {

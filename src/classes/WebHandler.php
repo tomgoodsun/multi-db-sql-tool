@@ -145,27 +145,8 @@ class WebHandler
         }
 
         // TODO: Remove lines, because these are test data
-        $tables['introduced_user_profile_header'] = ['name' => 'introduced_user_profile_header', 'comment' => 'Introduced User Profile Header (Unique)', 'databases' => ['shard1', 'shard2', 'shard3']];
-        $tables['user11'] = ['name' => 'user11', 'comment' => 'User 11', 'databases' => ['shard1', 'shard2', 'shard3']];
-        $tables['user12'] = ['name' => 'user12', 'comment' => 'User 12', 'databases' => ['shard1', 'shard2', 'shard3']];
-        $tables['user13'] = ['name' => 'user13', 'comment' => 'User 13', 'databases' => ['shard1', 'shard2', 'shard3']];
-        $tables['user14'] = ['name' => 'user14', 'comment' => 'User 14', 'databases' => ['shard1', 'shard2', 'shard3']];
-        $tables['user15'] = ['name' => 'user15', 'comment' => 'User 15', 'databases' => ['shard1', 'shard2', 'shard3']];
-        $tables['user16'] = ['name' => 'user16', 'comment' => 'User 16', 'databases' => ['shard1', 'shard2', 'shard3']];
-        $tables['user17'] = ['name' => 'user17', 'comment' => 'User 17', 'databases' => ['shard1', 'shard2', 'shard3']];
-        $tables['user18'] = ['name' => 'user18', 'comment' => 'User 18', 'databases' => ['shard1', 'shard2', 'shard3']];
-        $tables['user19'] = ['name' => 'user19', 'comment' => 'User 19', 'databases' => ['shard1', 'shard2', 'shard3']];
-        $tables['user20'] = ['name' => 'user20', 'comment' => 'User 20', 'databases' => ['shard1', 'shard2', 'shard3']];
-        $tables['user21'] = ['name' => 'user21', 'comment' => 'User 21', 'databases' => ['shard1', 'shard2', 'shard3']];
-        $tables['user22'] = ['name' => 'user22', 'comment' => 'User 22', 'databases' => ['shard1', 'shard2', 'shard3']];
-        $tables['user23'] = ['name' => 'user23', 'comment' => 'User 23', 'databases' => ['shard1', 'shard2', 'shard3']];
-        $tables['user24'] = ['name' => 'user24', 'comment' => 'User 24', 'databases' => ['shard1', 'shard2', 'shard3']];
-        $tables['user25'] = ['name' => 'user25', 'comment' => 'User 25', 'databases' => ['shard1', 'shard2', 'shard3']];
-        $tables['user26'] = ['name' => 'user26', 'comment' => 'User 26', 'databases' => ['shard1', 'shard2', 'shard3']];
-        $tables['user27'] = ['name' => 'user27', 'comment' => 'User 27', 'databases' => ['shard1', 'shard2', 'shard3']];
-        $tables['user28'] = ['name' => 'user28', 'comment' => 'User 28', 'databases' => ['shard1', 'shard2', 'shard3']];
-        $tables['user29'] = ['name' => 'user29', 'comment' => 'User 29', 'databases' => ['shard1', 'shard2', 'shard3']];
-        $tables['user30'] = ['name' => 'user30', 'comment' => 'User 30', 'databases' => ['shard1', 'shard2', 'shard3']];
+        //$tables['introduced_user_profile_header'] = ['name' => 'introduced_user_profile_header', 'comment' => 'Introduced User Profile Header (Unique)', 'databases' => ['shard1', 'shard2', 'shard3']];
+        //$tables['user11'] = ['name' => 'user11', 'comment' => 'User 11', 'databases' => ['shard1', 'shard2', 'shard3']];
 
         $this->json([
             'cluster' => $this->clusterName,
