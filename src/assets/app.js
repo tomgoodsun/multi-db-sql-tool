@@ -1,12 +1,22 @@
 (function(window, document) {
   let dbSelector = document.getElementById('db-selector');
 
+  /**
+   * Get the currently selected cluster from the dropdown.
+   *
+   * @returns {string} - Selected cluster name
+   */
   let getCurrentCluster = () => {
     let clusterName = document.getElementById('cluster-selector').value;
     console.log('Selected cluster:', clusterName);
     return clusterName;
   };
 
+  /**
+   * Get the selected target shards (databases) from the multi-select dropdown.
+   *
+   * @returns {Array} - Selected target shards (databases)
+   */
   let getTargetShards = () => {
     let selectedDbs = [];
     dbSelector.querySelectorAll('option').forEach(el => {
@@ -111,6 +121,11 @@
     sqlExecutionDialog.hide();
   };
 
+  /**
+   * Show confirmation dialog for SQL execution.
+   *
+   * @returns {void}
+   */
   let confirmSqlExecution = () => {
     sqlExecutionDialog.show();
   };
@@ -151,6 +166,8 @@
 
   /**
    * Create history content
+   *
+   * @returns {void}
    */
   let createHistoryContent = () => {
     fetch('?action=api_history')
@@ -209,6 +226,11 @@
 
   // ------------------------------------------------------------
 
+  /**
+   * Initialize result tabs and bind events.
+   *
+   * @returns {void}
+   */
   let initResultsTabs = () => {
     document.querySelectorAll('#results-tabs .results-tab').forEach(btn => {
       btn.addEventListener('click', evt => {
@@ -222,10 +244,20 @@
     updateTabNavigation();
   };
 
+  /**
+   * Activate a result tab.
+   *
+   * @param {string} targetId
+   */
   let activateResultTab = (targetId) => {
     activateTab(targetId, '#results-tabs .results-tab', '#results-content .tab-pane');
   };
 
+  /**
+   * Initialize sidebar tabs and bind events.
+   *
+   * @returns {void}
+   */
   let initSidebarTabs = () => {
     document.querySelectorAll('#sidebar-tabs .sidebar-tab').forEach(btn => {
       btn.addEventListener('click', evt => {
@@ -236,10 +268,22 @@
     activateSidebarTab('stab-1');
   };
 
+  /**
+   * Activate a sidebar tab.
+   *
+   * @param {string} targetId
+   */
   let activateSidebarTab = (targetId) => {
     activateTab(targetId, '#sidebar-tabs .sidebar-tab', '#sidebar-content .tab-pane');
   };
 
+  /**
+   * Activate a tab.
+   *
+   * @param {string} targetId
+   * @param {string} tabCssSelector
+   * @param {string} tabContentSelector
+   */
   let activateTab = (targetId, tabCssSelector, tabContentSelector) => {
     // Tab
     document.querySelectorAll(tabCssSelector).forEach(tab => {
@@ -258,6 +302,11 @@
     });
   };
 
+  /**
+   * Scroll the result tabs.
+   *
+   * @param {string} direction - The direction to scroll ('left' or 'right').
+   */
   let scrollTabs = (direction) => {
     const tabsContainer = document.getElementById('results-tabs');
     if (!tabsContainer) {
@@ -282,6 +331,11 @@
     setTimeout(() => updateTabNavigation(), 300);
   };
 
+  /**
+   * Update the state of the tab navigation buttons.
+   *
+   * @returns {void}
+   */
   let updateTabNavigation = () => {
     const tabsContainer = document.getElementById('results-tabs');
     const leftBtn = document.getElementById('tab-nav-left');
@@ -302,12 +356,18 @@
 
   // ------------------------------------------------------------
 
+  /**
+   * Create a result grid using ag-Grid.
+   *
+   * @param {HTMLElement} container - The container element to hold the grid.
+   * @param {Array} combinedData - The data to display in the grid.
+   */
   let createResultGrid = (container, combinedData) => {
-    const gridDiv = document.createElement('div');
+    let gridDiv = document.createElement('div');
     gridDiv.className = 'results-grid ag-theme-alpine';
     container.appendChild(gridDiv);
 
-    const columnDefs = Object.keys(combinedData[0]).map(key => ({
+    let columnDefs = Object.keys(combinedData[0]).map(key => ({
       field: key,
       headerName: key === '_shard' ? 'DB' : key,
       sortable: true,
@@ -318,7 +378,7 @@
       width: key === '_shard' ? 150 : undefined
     }));
 
-    const gridOptions = {
+    let gridOptions = {
       columnDefs,
       rowData: combinedData,
       defaultColDef: {
@@ -332,6 +392,11 @@
     new agGrid.Grid(gridDiv, gridOptions);
   };
 
+  /**
+   * Render the query results into tabs and grids.
+   *
+   * @param {Object} response - The response object containing the result set.
+   */
   let renderResults = (response) => {
     let tabArea = document.getElementById('results-tabs');
     let gridArea = document.getElementById('results-content');
@@ -403,61 +468,65 @@
     activateResultTab('tab-1');
   };
 
-  // TODO: Remove this test data in production
-  let testResults = {
-    'cluster': getCurrentCluster(),
-    'resultSet': [
-      {
-        'id': 1, 'errors': [], 'rows': 0, 'sql': 'select * from user1;',
-        'results': [
-          {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'}, {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' },
-          {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }, {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'}, {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'},
-          {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' }, {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }, {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'},
-          {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' }, {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }
-        ]
-      },
-      {
-        'id': 2, 'errors': [{'shard': 'db1', 'message': 'error message example'}], 'rows': 0, 'sql': 'select * from user1;',
-        'results': [
-          {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'}, {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' },
-          {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }, {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'}, {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'},
-          {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' }, {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }, {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'},
-          {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' }, {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }
-        ],
-      },
-      {
-        'id': 3,
-        'errors': [
-          {'shard': 'db1', 'message': 'error message example'},
-          {'shard': 'db1', 'message': 'error message example'},
-          {'shard': 'db1', 'message': 'error message example'},
-          {'shard': 'db1', 'message': 'error message example'},
-          {'shard': 'db1', 'message': 'error message example'},
-          {'shard': 'db1', 'message': 'error message example'}
-        ],
-        'rows': 0, 'sql': 'select * from user1;',
-        'results': [
-          {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'}, {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' },
-          {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }, {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'}, {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'},
-          {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' }, {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }, {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'},
-          {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' }, {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }
-        ],
-      },
-      {'id': 4, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
-      {'id': 5, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
-      {'id': 6, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
-      {'id': 7, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
-      {'id': 8, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
-      {'id': 9, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
-      {'id': 10, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]}
-    ],
-    'hasError': false
-  };
-
-  renderResults(testResults);
+  //// TODO: Remove this test data in production
+  //let testResults = {
+  //  'cluster': getCurrentCluster(),
+  //  'resultSet': [
+  //    {
+  //      'id': 1, 'errors': [], 'rows': 0, 'sql': 'select * from user1;',
+  //      'results': [
+  //        {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'}, {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' },
+  //        {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }, {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'}, {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'},
+  //        {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' }, {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }, {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'},
+  //        {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' }, {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }
+  //      ]
+  //    },
+  //    {
+  //      'id': 2, 'errors': [{'shard': 'db1', 'message': 'error message example'}], 'rows': 0, 'sql': 'select * from user1;',
+  //      'results': [
+  //        {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'}, {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' },
+  //        {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }, {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'}, {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'},
+  //        {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' }, {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }, {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'},
+  //        {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' }, {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }
+  //      ],
+  //    },
+  //    {
+  //      'id': 3,
+  //      'errors': [
+  //        {'shard': 'db1', 'message': 'error message example'},
+  //        {'shard': 'db1', 'message': 'error message example'},
+  //        {'shard': 'db1', 'message': 'error message example'},
+  //        {'shard': 'db1', 'message': 'error message example'},
+  //        {'shard': 'db1', 'message': 'error message example'},
+  //        {'shard': 'db1', 'message': 'error message example'}
+  //      ],
+  //      'rows': 0, 'sql': 'select * from user1;',
+  //      'results': [
+  //        {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'}, {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' },
+  //        {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }, {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'}, {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'},
+  //        {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' }, {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }, {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'},
+  //        {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' }, {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }
+  //      ],
+  //    },
+  //    {'id': 4, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
+  //    {'id': 5, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
+  //    {'id': 6, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
+  //    {'id': 7, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
+  //    {'id': 8, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
+  //    {'id': 9, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
+  //    {'id': 10, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]}
+  //  ],
+  //  'hasError': false
+  //};
+  //renderResults(testResults);
 
   // ------------------------------------------------------------
 
+  /**
+   * Initialize the application by loading cluster settings and populating the UI.
+   *
+   * @returns {void}
+   */
   let initialize = () => {
     let clusterName = getCurrentCluster();
 
@@ -504,6 +573,11 @@
 
   // ------------------------------------------------------------
 
+  /**
+   * Adjust styles dynamically based on window size.
+   *
+   * @returns {void}
+   */
   let adjustStyles = () => {
     document.querySelectorAll('.table-list, #db-selector').forEach(el => {
       el.style.height = (window.innerHeight - el.offsetTop) + 'px';
@@ -525,6 +599,7 @@
   };
 
   adjustStyles();
+
   // ------------------------------------------------------------
 
 })(window, window.document);
