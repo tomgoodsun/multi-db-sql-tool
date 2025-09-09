@@ -508,17 +508,143 @@
   //        {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' }, {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }
   //      ],
   //    },
-  //    {'id': 4, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
-  //    {'id': 5, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
-  //    {'id': 6, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
-  //    {'id': 7, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
-  //    {'id': 8, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
-  //    {'id': 9, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
+  //    //{'id': 4, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
+  //    //{'id': 5, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
+  //    //{'id': 6, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
+  //    //{'id': 7, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
+  //    //{'id': 8, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
+  //    //{'id': 9, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]},
   //    {'id': 10, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]}
   //  ],
   //  'hasError': false
   //};
+  //currentResults = testResults;
   //renderResults(testResults);
+
+  // ------------------------------------------------------------
+
+  /**
+   * Export results to CSV
+   *
+   * @returns {void}
+   */
+  let exportResultsCsv = () => {
+    if (!currentResults || Object.keys(currentResults).length === 0) {
+      //this.showAlert('No results to export', 'warning');
+      console.log('No results to export', 'warning');
+      return;
+    }
+
+    currentResults.resultSet.forEach(resultSetItem => {
+      let csv = convertToCSV(resultSetItem.results);
+      let dateStr = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+      let filename = `multi-db-query-${resultSetItem.id}-${dateStr}.csv`;
+      downloadCSV(csv, filename);
+    });
+  };
+
+  /**
+   * Convert data to CSV format
+   *
+   * @param {Object} data
+   * @returns
+   */
+  let convertToCSV = (data) => {
+    if (data.length === 0) {
+      return '';
+    }
+
+    let headers = Object.keys(data[0]);
+    let csvContent = [
+      headers.join(','),
+      ...data.map(row =>
+        headers.map(header => {
+          let value = row[header] || '';
+          let escaped = String(value).replace(/"/g, '""');
+          if (escaped.includes(',') || escaped.includes('"') || escaped.includes('\n')) {
+            return `"${escaped}"`;
+          }
+          return escaped;
+        }).join(',')
+      )
+    ].join('\n');
+
+    return csvContent;
+  };
+
+  /**
+   * Download CSV file
+   *
+   * @param {string} csvContent
+   * @param {string} filename
+   */
+  let downloadCSV = (csvContent, filename) => {
+    let blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
+    let link = document.createElement('a');
+    if (link.download !== undefined) {
+      let url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  /**
+   * Export results to XLSX
+   *
+   * @returns {void}
+   */
+  let exportResults = () => {
+    if (!currentResults || Object.keys(currentResults).length === 0) {
+      //this.showAlert('No results to export', 'warning');
+      console.log('No results to export', 'warning');
+      return;
+    }
+
+    try {
+      // Options for workbook
+      let wsopts = {
+        dateNF: 'yyyy-mm-dd hh:mm:ss'
+      };
+
+      let workbook = XLSX.utils.book_new();
+
+      currentResults.resultSet.forEach(resultSetItem => {
+        let combinedData = resultSetItem.results;
+        if (combinedData.length > 0) {
+          let worksheet = XLSX.utils.json_to_sheet(combinedData, wsopts);
+          let sheetName = `Query ${resultSetItem.id}`;
+          XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+        }
+      });
+
+      let dateStr = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+      let filename = `mdbsql-results-${dateStr}.xlsx`;
+      XLSX.writeFile(workbook, filename);
+
+      //this.showAlert('Results exported successfully', 'success');
+      console.log('Results exported successfully', 'success');
+    } catch (error) {
+      console.error('Export error:', error);
+      //this.showAlert('Export failed: ' + error.message, 'danger');
+      console.log('Export failed: ' + error.message, 'danger');
+    }
+  };
+
+  /**
+   * Initialize result exporter by binding buttons.
+   *
+   * @returns {void}
+   */
+  let initResultExporter = () => {
+    document.getElementById('btn-export-csv')?.addEventListener('click', () => exportResultsCsv());
+    document.getElementById('btn-export')?.addEventListener('click', () => exportResults());
+  };
+
+  initResultExporter();
 
   // ------------------------------------------------------------
 
