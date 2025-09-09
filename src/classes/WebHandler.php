@@ -10,7 +10,6 @@ class WebHandler
 
     protected $method = '';
     protected $action = '';
-    protected $lang = '';
     protected $clusterName = '';
 
     public function __construct()
@@ -19,7 +18,6 @@ class WebHandler
 
         $this->method = $_SERVER['REQUEST_METHOD'] ?? '';
         $this->action = $_REQUEST['action'] ?? '';
-        $this->lang = $_REQUEST['lang'] ?? '';
         $this->clusterName = $_REQUEST['cluster'] ?? '';
     }
 
