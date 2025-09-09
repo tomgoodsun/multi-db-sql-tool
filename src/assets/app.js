@@ -24,6 +24,7 @@
   let editorElement = document.getElementById('sql-editor')
   let sqlEditor = null;
   let isExecuting = false;
+  let sqlExecutionDialog = null;
 
   /**
    * Format the SQL query in the editor using sql-formatter library.
@@ -52,8 +53,10 @@
 
     let sql = sqlEditor.getValue().trim();
     if (!sql) {
+      console.warn('No SQL query to execute.');
       // TODO
       //window.alert(this.t('enter_sql_query'), 'warning');
+      sqlExecutionDialog.hide();
       return;
     }
 
@@ -101,6 +104,12 @@
       console.error('Unexpected error:', error);
       isExecuting = false;
     }
+
+    sqlExecutionDialog.hide();
+  };
+
+  let confirmSqlExecution = () => {
+    sqlExecutionDialog.show();
   };
 
   /**
@@ -108,9 +117,16 @@
    *
    * @returns {void}
    */
-  let initCodeMirror = () => {
+  let initSqlEditor = () => {
+    let modalEl = document.getElementById('execution-confirm');
+    sqlExecutionDialog = new bootstrap.Modal(modalEl, {
+      backdrop: 'static',
+      keyboard: false
+    });
+
     document.getElementById('btn-format')?.addEventListener('click', () => formatQuery());
-    document.getElementById('btn-execute')?.addEventListener('click', () => executeQuery());
+    document.getElementById('btn-execute')?.addEventListener('click', () => confirmSqlExecution());
+    document.getElementById('btn-confirm-execute').addEventListener('click', () => executeQuery());
 
     // Initialize CodeMirror
     sqlEditor = CodeMirror(editorElement, {
@@ -123,7 +139,7 @@
       //viewportMargin: Infinity,
       extraKeys: {
         'Ctrl-Enter': () => {
-          executeQuery();
+          confirmSqlExecution();
         },
         'Ctrl-Space': 'autocomplete'
       },
@@ -132,7 +148,21 @@
     sqlEditor.setSize('100%', '100%');
   };
 
-  initCodeMirror();
+  let getHistory = async () => {
+    let history = await fetch('?action=api_history')
+      .then(response => response.json())
+      .then(data => {
+        return data;
+      });
+      console.log('History data:', history);
+  };
+  //getHistory();
+
+  let executeHistory = () => {
+    // TODO: Implement history execution
+  };
+
+  initSqlEditor();
 
   // ------------------------------------------------------------
 
