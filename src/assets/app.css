@@ -417,6 +417,27 @@ html, body {
   padding: 1rem;
 }
 
+.modal-icon-warning {
+  color: var(--warning-color);
+  font-size: 2rem;
+  margin-right: 0.5rem;
+}
+.modal-icon-info {
+  color: var(--info-color);
+  font-size: 2rem;
+  margin-right: 0.5rem;
+}
+.modal-icon-danger {
+  color: var(--danger-color);
+  font-size: 2rem;
+  margin-right: 0.5rem;
+}
+.modal-icon-success {
+  color: var(--success-color);
+  font-size: 2rem;
+  margin-right: 0.5rem;
+}
+
 /* History list */
 .history-list {
   max-height: 400px;

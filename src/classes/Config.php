@@ -111,6 +111,6 @@ class Config
      */
     public static function isReadOnlyMode()
     {
-        return (bool)self::getInstance()->get('read_only_mode', false);
+        return (bool)self::getInstance()->get('readonly_mode', false);
     }
 }

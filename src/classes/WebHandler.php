@@ -58,9 +58,9 @@ class WebHandler
 
         $resultSet = [];
         $targetShards = $_REQUEST['shards'] ?? [];
-        $sql = $_REQUEST['sql'] ?? '';
+        $reqSql = $_REQUEST['sql'] ?? '';
 
-        $sqls = Utility::splitSqlStatements($sql);
+        $sqls = Utility::splitSqlStatements($reqSql);
 
         $hasError = false;
         $id = 1;
@@ -72,7 +72,6 @@ class WebHandler
                 $query = new Query($sql);
                 $query->bulkAddConnections($dbSettings);
                 $result = $query->query();
-                $this->sessionManager->addQueryHistory($sql, $this->clusterName);
             } catch (\Throwable $e) {
                 $error = $e->getMessage();
                 $hasError = true;
@@ -89,6 +88,8 @@ class WebHandler
             $resultSet[] = $result;
             $id++;
         }
+
+        $this->sessionManager->addQueryHistory($reqSql, $this->clusterName);
 
         $this->json([
             'cluster' => $this->clusterName,

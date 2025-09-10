@@ -34,6 +34,8 @@
   let editorElement = document.getElementById('sql-editor')
   let sqlEditor = null;
   let isExecuting = false;
+  let alertDialogElem = document.getElementById('alert-dialog');
+  let alertDialog = null;
   let sqlExecutionDialogElem = document.getElementById('execution-confirm');
   let sqlExecutionDialog = null;
   let historyDialogElem = document.getElementById('sql-history');
@@ -128,11 +130,13 @@
     if (!window.MultiDbSql.isReadOnlyMode) {
       return true;
     }
+
     let sqls = splitSql(sql);
     if (sqls.length === 0) {
       return false;
     }
-    return sqls.every(stmt => !isReadOnlyQuery(stmt));
+
+    return sqls.every(stmt => isReadOnlyQuery(stmt));
   };
 
   /**
@@ -151,6 +155,14 @@
       // TODO
       //window.alert(this.t('enter_sql_query'), 'warning');
       sqlExecutionDialog.hide();
+      return;
+    }
+
+    console.log('Executing SQL:', sql);
+    if (!canExecuteQuery(sql)) {
+      console.log('This query is read-only and cannot be executed.');
+      sqlExecutionDialog.hide();
+      showAlert('This query is read-only and cannot be executed.', 'warning');
       return;
     }
 
@@ -194,6 +206,27 @@
   };
 
   /**
+   * Show alert dialog with a message.
+   *
+   * @param {string} message
+   * @param {string} type
+   * @returns {void}
+   */
+  let showAlert = (message, type = 'info') => {
+    alertDialogElem.querySelector('.modal-body').innerHTML = message.replace(/\n/g, '<br>');
+    let title = '<i class="bi bi-info-circle modal-icon modal-icon-info"></i> Info';
+    if (type === 'warning') {
+      title = '<i class="bi bi-exclamation-octagon-fill modal-icon modal-icon-warning"></i> Warning';
+    } else if (type === 'danger') {
+      title = '<i class="bi bi-x-octagon-fill modal-icon modal-icon-danger"></i> Error';
+    } else if (type === 'success') {
+      title = '<i class="bi bi-check-circle-fill modal-icon modal-icon-success"></i> Success';
+    }
+    alertDialogElem.querySelector('.modal-title').innerHTML = title;
+    alertDialog.show();
+  };
+
+  /**
    * Show confirmation dialog for SQL execution.
    *
    * @returns {void}
@@ -208,6 +241,7 @@
    * @returns {void}
    */
   let initSqlEditor = () => {
+    alertDialog = new bootstrap.Modal(alertDialogElem, {backdrop: 'static', keyboard: false});
     sqlExecutionDialog = new bootstrap.Modal(sqlExecutionDialogElem, {backdrop: 'static', keyboard: false});
     historyDialog = new bootstrap.Modal(historyDialogElem, {backdrop: 'static', keyboard: false});
 
