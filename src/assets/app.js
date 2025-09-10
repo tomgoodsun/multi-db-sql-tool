@@ -189,6 +189,7 @@
             console.error('Query execution error:', data.error);
           }
           currentResults = data;
+
           renderResults(data);
         })
         .catch(error => {
@@ -470,6 +471,10 @@
    * @param {Array} combinedData - The data to display in the grid.
    */
   let createResultGrid = (container, combinedData) => {
+    if (!combinedData || combinedData.length === 0) {
+      return;
+    }
+
     let gridDiv = document.createElement('div');
     gridDiv.className = 'results-grid ag-theme-alpine';
     container.appendChild(gridDiv);
@@ -702,11 +707,12 @@
 
       currentResults.resultSet.forEach(resultSetItem => {
         let combinedData = resultSetItem.results;
-        if (combinedData.length > 0) {
-          let worksheet = XLSX.utils.json_to_sheet(combinedData, wsopts);
-          let sheetName = `Query ${resultSetItem.id}`;
-          XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+        if (0 === combinedData.length) {
+          combinedData = [{}];
         }
+        let worksheet = XLSX.utils.json_to_sheet(combinedData, wsopts);
+        let sheetName = `Query ${resultSetItem.id}`;
+        XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
       });
 
       let dateStr = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
