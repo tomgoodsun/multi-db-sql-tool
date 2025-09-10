@@ -48,7 +48,7 @@ http://localhost:8080
 - Three databases as sharding-architecture
 - Each database has two tables, `users` and `orders`
 
-## Frontend Libralies
+## Frontend Libraries
 
 - [Normalize.css](https://necolas.github.io/normalize.css/)
 - [jQuery](https://jquery.com/) 3.5
