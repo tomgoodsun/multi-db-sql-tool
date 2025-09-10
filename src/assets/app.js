@@ -70,14 +70,14 @@
     let inDoubleQuote = false;
     let inBacktick = false;
     for (let char of sql) {
-      if (char === "'" && !inDoubleQuote && !inBacktick) {
+      if ("'" === char && !inDoubleQuote && !inBacktick) {
         inSingleQuote = !inSingleQuote;
-      } else if (char === '"' && !inSingleQuote && !inBacktick) {
+      } else if ('"' === char && !inSingleQuote && !inBacktick) {
         inDoubleQuote = !inDoubleQuote;
-      } else if (char === '`' && !inSingleQuote && !inDoubleQuote) {
+      } else if ('`' === char && !inSingleQuote && !inDoubleQuote) {
         inBacktick = !inBacktick;
       }
-      if (char === ';' && !inSingleQuote && !inDoubleQuote && !inBacktick) {
+      if (';' === char && !inSingleQuote && !inDoubleQuote && !inBacktick) {
         if (currentStatement.trim()) {
           sqls.push(currentStatement.trim());
           currentStatement = '';
@@ -132,7 +132,7 @@
     }
 
     let sqls = splitSql(sql);
-    if (sqls.length === 0) {
+    if (0 === sqls.length) {
       return false;
     }
 
@@ -216,11 +216,11 @@
   let showAlert = (message, type = 'info') => {
     alertDialogElem.querySelector('.modal-body').innerHTML = message.replace(/\n/g, '<br>');
     let title = '<i class="bi bi-info-circle modal-icon modal-icon-info"></i> Info';
-    if (type === 'warning') {
+    if ('warning' === type) {
       title = '<i class="bi bi-exclamation-octagon-fill modal-icon modal-icon-warning"></i> Warning';
-    } else if (type === 'danger') {
+    } else if ('danger' === type || 'error' === type) {
       title = '<i class="bi bi-x-octagon-fill modal-icon modal-icon-danger"></i> Error';
-    } else if (type === 'success') {
+    } else if ('success' === type) {
       title = '<i class="bi bi-check-circle-fill modal-icon modal-icon-success"></i> Success';
     }
     alertDialogElem.querySelector('.modal-title').innerHTML = title;
@@ -291,7 +291,7 @@
 
         let container = document.createElement('div');
 
-        if (data.histories.length === 0) {
+        if (0 === data.histories.length) {
           container.innerHTML = '<p class="text-muted">No query history available.</p>';
           return container;
         }
@@ -424,7 +424,7 @@
     const scrollAmount = 200;
     const currentScroll = tabsContainer.scrollLeft;
 
-    if (direction === 'left') {
+    if ('left' === direction) {
       tabsContainer.scrollTo({
         left: currentScroll - scrollAmount,
         behavior: 'smooth'
@@ -471,7 +471,7 @@
    * @param {Array} combinedData - The data to display in the grid.
    */
   let createResultGrid = (container, combinedData) => {
-    if (!combinedData || combinedData.length === 0) {
+    if (!combinedData || 0 === combinedData.length) {
       return;
     }
 
@@ -481,13 +481,13 @@
 
     let columnDefs = Object.keys(combinedData[0]).map(key => ({
       field: key,
-      headerName: key === '_shard' ? 'DB' : key,
+      headerName: '_shard' === key ? 'DB' : key,
       sortable: true,
       filter: true,
       resizable: true,
-      pinned: key === '_shard' ? 'left' : false,
-      cellClass: key === '_shard' ? 'shard-column' : '',
-      width: key === '_shard' ? 150 : undefined
+      pinned: '_shard' === key ? 'left' : false,
+      cellClass: '_shard' === key ? 'shard-column' : '',
+      width: '_shard' === key ? 150 : undefined
     }));
 
     let gridOptions = {
@@ -622,7 +622,7 @@
    * @returns {void}
    */
   let exportResultsCsv = () => {
-    if (!currentResults || Object.keys(currentResults).length === 0) {
+    if (!currentResults || 0 === Object.keys(currentResults).length) {
       //this.showAlert('No results to export', 'warning');
       console.log('No results to export', 'warning');
       return;
@@ -643,7 +643,7 @@
    * @returns
    */
   let convertToCSV = (data) => {
-    if (data.length === 0) {
+    if (0 === data.length) {
       return '';
     }
 
@@ -674,7 +674,7 @@
   let downloadCSV = (csvContent, filename) => {
     let blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
     let link = document.createElement('a');
-    if (link.download !== undefined) {
+    if (undefined !== link.download) {
       let url = URL.createObjectURL(blob);
       link.setAttribute('href', url);
       link.setAttribute('download', filename);
@@ -691,7 +691,7 @@
    * @returns {void}
    */
   let exportResults = () => {
-    if (!currentResults || Object.keys(currentResults).length === 0) {
+    if (!currentResults || 0 === Object.keys(currentResults).length) {
       //this.showAlert('No results to export', 'warning');
       console.log('No results to export', 'warning');
       return;

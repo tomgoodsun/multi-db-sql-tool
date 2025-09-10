@@ -17,17 +17,17 @@ class Utility
         $len = strlen($sql);
         for ($i = 0; $i < $len; $i++) {
             $char = $sql[$i];
-            if ($char === "'" || $char === '"') {
+            if ("'" === $char || '"' === $char) {
                 $inString = !$inString;
             }
-            if ($char === ';' && !$inString) {
+            if (';' === $char && !$inString) {
                 $statements[] = trim($buffer);
                 $buffer = '';
             } else {
                 $buffer .= $char;
             }
         }
-        if (trim($buffer) !== '') {
+        if ('' === trim($buffer)) {
             $statements[] = trim($buffer);
         }
         return $statements;
@@ -47,7 +47,7 @@ class Utility
         foreach ($lines as $line) {
             $line = preg_replace('/--.*$/', '', $line); // Remove single-line comments
             $line = preg_replace('/\/\*.*?\*\//s', '', $line); // Remove multi-line comments
-            if (trim($line) !== '') {
+            if ('' !== trim($line)) {
                 $cleanedLines[] = trim($line);
             }
         }
@@ -67,7 +67,7 @@ class Utility
         $sql = preg_replace('/^[\s\(]+/', ' ', $sql); // Remove leading whitespace and parentheses
         $sql = strtoupper($sql);
         $pattern = '/^\s*(SELECT|SHOW|DESCRIBE|DESC|EXPLAIN)\b/i';
-        return preg_match($pattern, $sql) === 1;
+        return 1 === preg_match($pattern, $sql);
     }
 
     /**

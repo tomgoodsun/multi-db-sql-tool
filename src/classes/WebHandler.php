@@ -28,7 +28,7 @@ class WebHandler
      */
     protected function isPostMethod()
     {
-        return strtoupper($this->method) === 'POST';
+        return 'POST' === strtoupper($this->method);
     }
 
     /**

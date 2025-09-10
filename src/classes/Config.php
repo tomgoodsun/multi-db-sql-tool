@@ -11,7 +11,7 @@ class Config
      */
     protected function __construct($configPath = null)
     {
-        if ($configPath === null) {
+        if (null === $configPath) {
             $configPath = __DIR__ . '/../config/config.php';
         }
 
@@ -28,7 +28,7 @@ class Config
     public static function getInstance()
     {
         static $instance;
-        if ($instance === null) {
+        if (null === $instance) {
             $instance = new self();
         }
         return $instance;
