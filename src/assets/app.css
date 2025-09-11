@@ -22,6 +22,12 @@ html, body {
   padding: 0;
 }
 
+.app-logo {
+  height: 1.5em;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
 .app-container {
   height: inherit;
   overflow: hidden;

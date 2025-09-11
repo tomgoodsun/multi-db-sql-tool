@@ -1,5 +1,7 @@
 # Multi-DB SQL Tool
 
+![Multi-DB SQL Tool](img/logo.png "Sample")
+
 SQL execution tool for multiple database or schema environment like sharding architecture.
 
 It must be useful for people that
