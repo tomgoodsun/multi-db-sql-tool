@@ -1,6 +1,6 @@
 # Multi-DB SQL Tool
 
-![Multi-DB SQL Tool](img/logo.png "Sample")
+![Multi-DB SQL Tool](img/logo.png "Logo")
 
 SQL execution tool for multiple database or schema environment like sharding architecture.
 
@@ -10,7 +10,7 @@ It must be useful for people that
 - distriibuted edge databases (**databases on each chain store**)
 
 Demo
-<video src="img/demo.mp4" controls="true"></video>
+![Multi-DB SQL Tool](img/demo.gif "Demo")
 
 ## Feature
 
