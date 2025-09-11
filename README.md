@@ -9,6 +9,9 @@ It must be useful for people that
 - have the horizontal-partitioned databases (**shardingj**)
 - distriibuted edge databases (**databases on each chain store**)
 
+Demo
+<video src="img/demo.mp4" controls="true"></video>
+
 ## Feature
 
 - Multiple database SQL execution
