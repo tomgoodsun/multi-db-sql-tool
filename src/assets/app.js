@@ -2,6 +2,19 @@
   let dbSelector = document.getElementById('db-selector');
 
   /**
+   * Create a date-time string for the filename.
+   *
+   * @returns {string} - Formatted date-time string
+   */
+  let createDateTimeStrForFilename = () => {
+    console.log(new Date().toISOString());
+    let dateStr = new Date().toISOString().slice(0, 19).replace(/:/g, '');
+    dateStr = dateStr.replace('T', '_');
+    dateStr = dateStr.replace(/-/g, '');
+    return dateStr + 'Z';
+  };
+
+  /**
    * Get the currently selected cluster from the dropdown.
    *
    * @returns {string} - Selected cluster name
@@ -628,9 +641,10 @@
       return;
     }
 
+    let dateStr = createDateTimeStrForFilename();
+
     currentResults.resultSet.forEach(resultSetItem => {
       let csv = convertToCSV(resultSetItem.results);
-      let dateStr = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
       let filename = `${window.MultiDbSql.appShortNameLower}-result-${dateStr}-query-${resultSetItem.id}.csv`;
       downloadCSV(csv, filename);
     });
@@ -715,7 +729,7 @@
         XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
       });
 
-      let dateStr = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+      let dateStr = createDateTimeStrForFilename();
       let filename = `${window.MultiDbSql.appShortNameLower}-results-${dateStr}.xlsx`;
       XLSX.writeFile(workbook, filename);
 
