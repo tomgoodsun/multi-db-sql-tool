@@ -514,7 +514,10 @@
       enableCellTextSelection: true
     };
 
-    new agGrid.Grid(gridDiv, gridOptions);
+    // new agGrid.Grid(gridDiv, gridOptions); is deprecated.
+    // see: https://www.ag-grid.com/javascript-data-grid/upgrading-to-ag-grid-31/#creating-ag-grid
+    agGrid.createGrid(gridDiv, gridOptions);
+
   };
 
   /**
