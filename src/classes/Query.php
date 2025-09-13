@@ -82,6 +82,7 @@ class Query
     public function addConnection($name, $dsn, $username, $password)
     {
         $this->connections[$name] = new \PDO($dsn, $username, $password);
+        $this->connections[$name]->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         return $this;
     }
 
