@@ -21,13 +21,13 @@ class Utility
                 $inString = !$inString;
             }
             if (';' === $char && !$inString) {
-                $statements[] = trim($buffer);
+                $statements[] = trim($buffer) . ';';
                 $buffer = '';
             } else {
                 $buffer .= $char;
             }
         }
-        if ('' === trim($buffer)) {
+        if ('' !== trim($buffer)) {
             $statements[] = trim($buffer);
         }
         return $statements;
