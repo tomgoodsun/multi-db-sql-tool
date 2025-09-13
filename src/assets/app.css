@@ -307,6 +307,7 @@ html, body {
   white-space: nowrap;
 }
 .sidebar-tab {
+  display: inline-block;
   text-align: center;
   width: 50%;
 }
