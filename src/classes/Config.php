@@ -12,6 +12,10 @@ class Config
     const APP_SHORT_NAME = 'mDBSQL';
     const VERSION = '1.0.0-alpha';
 
+    const DEFAULT_SESSION_NAME = 'MDBSQL_SESSION';
+    const DEFAULT_SESSION_LIFETIME = 86400; // 1 day
+    const MAX_QUERY_HISTORY = 50;
+
     protected $settings = [];
 
     /**
