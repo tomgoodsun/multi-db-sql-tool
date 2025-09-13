@@ -162,6 +162,10 @@ class WebHandler
      */
     protected function processWeb()
     {
+        $appName = Config::APP_NAME;
+        $appShortName = Config::APP_SHORT_NAME;
+        $appShortNameLower = strtolower($appShortName);
+        $version = Config::VERSION;
         $optionalName = Config::getInstance()->get('optional_name', '');
         $optionalName = $optionalName ? " for {$optionalName}" : '';
         $clausterList = Config::getInstance()->getClusterNames();

@@ -4,6 +4,14 @@ namespace MultiDbSqlTool;
 
 class Config
 {
+
+    /**
+     * App info
+     */
+    const APP_NAME = 'Multi-DB SQL Tool';
+    const APP_SHORT_NAME = 'mDBSQL';
+    const VERSION = '1.0.0-alpha';
+
     protected $settings = [];
 
     /**

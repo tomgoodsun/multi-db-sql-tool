@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Multi-DB SQL Tool<?php echo ' ' . $optionalName; ?></title>
+  <title><?php echo $appName . ' ' . $version; ?><?php echo ' ' . $optionalName; ?></title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="alternate icon" href="favicon.ico">
 
@@ -28,7 +28,7 @@
     <div class="header">
       <h1>
         <img src="favicon.svg" alt="logo" class="app-logo">
-        Multi-DB SQL Tool
+        <?php echo $appName . ' ' . $version; ?>
         <span class="optional-name"><?php echo ' ' . $optionalName; ?></span>
       </h1>
 
@@ -245,6 +245,9 @@
 
   <script>
     window.MultiDbSql = {
+      appShortName: '<?php echo $appShortName; ?>',
+      appShortNameLower: '<?php echo $appShortNameLower; ?>',
+      version: '<?php echo $version; ?>',
       isReadOnlyMode: <?php echo $readOnlyMode ? 'true' : 'false'; ?>,
     };
   </script>

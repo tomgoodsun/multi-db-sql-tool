@@ -631,7 +631,7 @@
     currentResults.resultSet.forEach(resultSetItem => {
       let csv = convertToCSV(resultSetItem.results);
       let dateStr = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-      let filename = `multi-db-query-${resultSetItem.id}-${dateStr}.csv`;
+      let filename = `${window.MultiDbSql.appShortNameLower}-result-${dateStr}-query-${resultSetItem.id}.csv`;
       downloadCSV(csv, filename);
     });
   };
@@ -716,7 +716,7 @@
       });
 
       let dateStr = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-      let filename = `mdbsql-results-${dateStr}.xlsx`;
+      let filename = `${window.MultiDbSql.appShortNameLower}-results-${dateStr}.xlsx`;
       XLSX.writeFile(workbook, filename);
 
       //this.showAlert('Results exported successfully', 'success');
