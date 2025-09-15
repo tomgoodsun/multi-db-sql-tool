@@ -19,6 +19,28 @@ class WebHandler
         $this->method = $_SERVER['REQUEST_METHOD'] ?? '';
         $this->action = $_REQUEST['action'] ?? '';
         $this->clusterName = $_REQUEST['cluster'] ?? '';
+
+        try {
+            $this->validateCluster();
+        } catch (\Throwable $e) {
+            http_response_code(400);
+            $this->json(['error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Validate the incoming request
+     *
+     * @return void
+     */
+    protected function validateCluster()
+    {
+        if (0 === strlen($this->clusterName)) {
+            return;
+        }
+        if (!in_array($this->clusterName, Config::getInstance()->getClusterNames(), true)) {
+            throw new \Exception('Invalid cluster name');
+        }
     }
 
     /**
