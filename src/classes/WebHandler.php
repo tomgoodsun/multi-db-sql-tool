@@ -139,7 +139,7 @@ class WebHandler
                 }
                 $tables[$tableName]['databases'][] = $shard;
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $error = $e->getMessage();
         }
 
