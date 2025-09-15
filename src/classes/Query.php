@@ -8,6 +8,8 @@ class Query
      */
     protected $sql = '';
 
+    protected $isReadOnlyQuery = true;
+
     /**
      * @var array
      */
@@ -43,6 +45,7 @@ class Query
     {
         $this->sql = trim($sql);
         $this->params = $params;
+        $this->isReadOnlyQuery = Utility::isReadOnlyQuery($this->sql);
     }
 
     /**
@@ -74,7 +77,7 @@ class Query
     {
         $limits = Config::getInstance()->get('limits', []);
         $timeout = $limits['connection_timeout'] ?? 10;
-        
+
         $options = [
             \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
             \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
@@ -82,7 +85,7 @@ class Query
             \PDO::MYSQL_ATTR_INIT_COMMAND => "SET sql_mode='STRICT_TRANS_TABLES', time_zone='+00:00'",
             \PDO::MYSQL_ATTR_FOUND_ROWS => true
         ];
-        
+
         return new \PDO($dsn, $username, $password, $options);
     }
 
@@ -132,7 +135,7 @@ class Query
             }
             $results[] = $tmp;
         }
-        
+
         return $result;
     }
 
@@ -151,9 +154,15 @@ class Query
                 $stmt = $connection->prepare($this->sql);
                 $stmt->execute($this->params);
                 $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-                $result = self::formatResult($name, $result, $results);
+                if ($this->isReadOnlyQuery) {
+                    $rowCount = count($result);
+                    $result = self::formatResult($name, $result, $results);
+                } else {
+                    $rowCount = $stmt->rowCount();
+                    $result = self::formatResult($name, [['affected_rows' => $rowCount]], $results);
+                }
                 $this->resultSet[$name] = $result;
-                $this->rowCounts[$name] = count($result);
+                $this->rowCounts[$name] = $rowCount;
             } catch (\Throwable $e) {
                 $this->errors[$name] = [
                     'shard' => $name,
