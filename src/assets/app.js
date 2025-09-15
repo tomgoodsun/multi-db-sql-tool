@@ -7,7 +7,6 @@
    * @returns {string} - Formatted date-time string
    */
   let createDateTimeStrForFilename = () => {
-    console.log(new Date().toISOString());
     let dateStr = new Date().toISOString().slice(0, 19).replace(/:/g, '');
     dateStr = dateStr.replace('T', '_');
     dateStr = dateStr.replace(/-/g, '');
@@ -21,7 +20,6 @@
    */
   let getCurrentCluster = () => {
     let clusterName = document.getElementById('cluster-selector').value;
-    console.log('Selected cluster:', clusterName);
     return clusterName;
   };
 
@@ -37,14 +35,13 @@
         selectedDbs.push(el.value);
       }
     });
-    console.log('Selected DBs:', selectedDbs);
     return selectedDbs;
   };
 
   // ------------------------------------------------------------
 
   let currentResults = {};
-  let editorElement = document.getElementById('sql-editor')
+  let editorElement = document.getElementById('sql-editor');
   let sqlEditor = null;
   let isExecuting = false;
   let alertDialogElem = document.getElementById('alert-dialog');
@@ -99,6 +96,7 @@
         currentStatement += char;
       }
     }
+
     if (currentStatement.trim()) {
       sqls.push(currentStatement.trim());
     }
@@ -164,14 +162,12 @@
 
     let sql = sqlEditor.getValue().trim();
     if (!sql) {
-      console.warn('No SQL query to execute.');
-      // TODO
-      //window.alert(this.t('enter_sql_query'), 'warning');
+      console.log('No SQL query to execute.');
+      showAlert('No SQL query to execute.', 'warning');
       sqlExecutionDialog.hide();
       return;
     }
 
-    console.log('Executing SQL:', sql);
     if (!canExecuteQuery(sql)) {
       console.log('This query is read-only and cannot be executed.');
       sqlExecutionDialog.hide();
@@ -187,17 +183,14 @@
       postData.append('action', 'api_query');
       postData.append('cluster', getCurrentCluster());
       getTargetShards().forEach(db => {
-        console.log(db);
         postData.append('shards[]', db);
       });
       postData.append('sql', sql);
-      console.log(postData);
 
       // This API call must user POST method to avoid URL length limit
       fetch('', {method: 'POST', body: postData})
         .then(response => response.json())
         .then(data => {
-          console.log('Query response:', data);
           if (data.hasError) {
             console.error('Query execution error:', data.error);
           }
@@ -293,15 +286,6 @@
     fetch('?action=api_history')
       .then(response => response.json())
       .then(data => {
-        // TODO: Test data
-        // data = {
-        //   "histories": [
-        //     {"cluster": "development_cluster", "sql": "select * from users", "timestamp": 1757430299, "formattedTime": "2025-09-09T15:04:59+00:00"}
-        //   ]
-        // }
-
-        console.log('History result:', data);
-
         let container = document.createElement('div');
 
         if (0 === data.histories.length) {
@@ -596,40 +580,6 @@
     activateResultTab('tab-1');
   };
 
-  // TODO: Remove this test data in production
-  //let testResults = {
-  //  'cluster': getCurrentCluster(),
-  //  'resultSet': [
-  //    {
-  //      'id': 1, 'errors': [], 'rows': 0, 'sql': 'select * from user1;',
-  //      'results': [
-  //        {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'}, {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' },
-  //        {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }, {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'}, {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'},
-  //        {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' }, {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }, {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'},
-  //        {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' }, {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }
-  //      ]
-  //    },
-  //    {
-  //      'id': 3,
-  //      'errors': [
-  //        {'shard': 'db1', 'message': 'error message example'},
-  //        {'shard': 'db1', 'message': 'error message example'}
-  //      ],
-  //      'rows': 0, 'sql': 'select * from user1;',
-  //      'results': [
-  //        {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'}, {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' },
-  //        {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }, {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'}, {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'},
-  //        {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' }, {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }, {_shard: 'db1', id: 1, name: 'Alice'  }, {_shard: 'db2', id:  2, name: 'Bob'  }, {_shard: 'db1', id: 3, name: 'Charlie'}, {_shard: 'db2', id:  4, name: 'David'},
-  //        {_shard: 'db1', id: 5, name: 'Eve'    }, {_shard: 'db2', id:  6, name: 'Frank'}, {_shard: 'db1', id: 7, name: 'Grace'  }, {_shard: 'db2', id:  8, name: 'Hank' }, {_shard: 'db1', id: 9, name: 'Ivy'    }, {_shard: 'db2', id: 10, name: 'Jack' }
-  //      ],
-  //    },
-  //    {'id': 10, 'errors': [], 'rows': 0, 'sql': 'select * from user1;', 'results': [{_shard: 'db1', id: 1, name: 'Alice'}, {_shard: 'db2', id:  2, name: 'Bob'}, {_shard: 'db1', id: 3, name: 'Charlie'}]}
-  //  ],
-  //  'hasError': false
-  //};
-  //currentResults = testResults;
-  //renderResults(testResults);
-
   // ------------------------------------------------------------
 
   /**
@@ -639,8 +589,7 @@
    */
   let exportResultsCsv = () => {
     if (!currentResults || 0 === Object.keys(currentResults).length) {
-      //this.showAlert('No results to export', 'warning');
-      console.log('No results to export', 'warning');
+      showAlert('No results to export', 'warning');
       return;
     }
 
@@ -709,8 +658,7 @@
    */
   let exportResults = () => {
     if (!currentResults || 0 === Object.keys(currentResults).length) {
-      //this.showAlert('No results to export', 'warning');
-      console.log('No results to export', 'warning');
+      showAlert('No results to export', 'warning');
       return;
     }
 
@@ -736,12 +684,11 @@
       let filename = `${window.MultiDbSql.appShortNameLower}-results-${dateStr}.xlsx`;
       XLSX.writeFile(workbook, filename);
 
-      //this.showAlert('Results exported successfully', 'success');
+      //showAlert('Results exported successfully', 'success');
       console.log('Results exported successfully', 'success');
     } catch (error) {
+      showAlert('Export failed: ' + error.message, 'danger');
       console.error('Export error:', error);
-      //this.showAlert('Export failed: ' + error.message, 'danger');
-      console.log('Export failed: ' + error.message, 'danger');
     }
   };
 
@@ -770,7 +717,6 @@
     fetch(`?action=api_initial_data&cluster=${encodeURIComponent(clusterName)}`)
       .then(response => response.json())
       .then(data => {
-        console.log(data);
         let elem = document.getElementById('table-list');
         elem.innerHTML = '';
         for (let i in data.tables) {
@@ -806,6 +752,11 @@
   };
 
   initialize();
+
+  // Setup event listeners
+  document.getElementById('cluster-selector')?.addEventListener('change', () => {
+    initialize();
+  });
 
   // ------------------------------------------------------------
 
