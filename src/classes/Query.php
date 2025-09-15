@@ -41,10 +41,16 @@ class Query
      */
     public function __construct($sql, $params = [])
     {
-        $this->sql = $sql;
+        $this->sql = trim($sql);
         $this->params = $params;
     }
 
+    /**
+     * Create DSN string from connection config
+     *
+     * @param array $conn
+     * @return string
+     */
     public static function createDsn(array $conn)
     {
         $dsn = 'mysql:';
@@ -54,6 +60,30 @@ class Query
             }
         }
         return $dsn;
+    }
+
+    /**
+     * Create PDO connection with proper options
+     *
+     * @param string $dsn
+     * @param string $username
+     * @param string $password
+     * @return \PDO
+     */
+    protected function createConnection($dsn, $username, $password)
+    {
+        $limits = Config::getInstance()->get('limits', []);
+        $timeout = $limits['connection_timeout'] ?? 10;
+        
+        $options = [
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+            \PDO::ATTR_TIMEOUT => $timeout,
+            \PDO::MYSQL_ATTR_INIT_COMMAND => "SET sql_mode='STRICT_TRANS_TABLES', time_zone='+00:00'",
+            \PDO::MYSQL_ATTR_FOUND_ROWS => true
+        ];
+        
+        return new \PDO($dsn, $username, $password, $options);
     }
 
     /**
@@ -81,8 +111,7 @@ class Query
      */
     public function addConnection($name, $dsn, $username, $password)
     {
-        $this->connections[$name] = new \PDO($dsn, $username, $password);
-        $this->connections[$name]->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $this->connections[$name] = $this->createConnection($dsn, $username, $password);
         return $this;
     }
 
@@ -92,18 +121,18 @@ class Query
      * @param string $shardName
      * @param array $result
      * @param array $results
-     * @return void
+     * @return array
      */
     public static function formatResult($shardName, array $result, array &$results)
     {
         foreach ($result as &$row) {
-            $tmp = [];
-            $tmp['__shard'] = $shardName;
+            $tmp = ['__shard' => $shardName];
             foreach ($row as $k => $v) {
                 $tmp[$k] = $v;
             }
             $results[] = $tmp;
         }
+        
         return $result;
     }
 

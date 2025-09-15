@@ -127,11 +127,15 @@ class WebHandler
      */
     protected function processApiHistory()
     {
-        $histories = $this->sessionManager->getQueryHistory();
-        $this->json([
-            //'cluster' => $this->clusterName,
-            'histories' => $histories,
-        ]);
+        try {
+            $histories = $this->sessionManager->getQueryHistory();
+            $this->json([
+                'histories' => $histories,
+            ]);
+        } catch (\Throwable $e) {
+            http_response_code(400);
+            $this->json(['error' => $e->getMessage()]);
+        }
     }
 
     /**

@@ -19,12 +19,19 @@ class Config
     protected $settings = [];
 
     /**
-     * Undocumented function
+     * Constructor
+     *
+     * @param string|null $configPath
+     * @throws \RuntimeException
      */
     protected function __construct($configPath = null)
     {
         if (null === $configPath) {
             $configPath = __DIR__ . '/../config/config.php';
+        }
+
+        if (!file_exists($configPath)) {
+            throw new \RuntimeException("Configuration file not found: {$configPath}");
         }
 
         // Load configuration settings
@@ -90,17 +97,35 @@ class Config
     }
 
     /**
+     * Check if cluster exists
+     *
+     * @param string $clusterName
+     * @return boolean
+     */
+    public static function clusterExists($clusterName)
+    {
+        return in_array($clusterName, self::getClusterNames());
+    }
+
+    /**
      * Get database settings for a specific cluster.
      *
      * @param string $clusterName
+     * @param array $targetShards
      * @return array
+     * @throws \InvalidArgumentException
      */
     public static function getDatabaseSettings($clusterName, array $targetShards = [])
     {
+        if (!self::clusterExists($clusterName)) {
+            throw new \InvalidArgumentException("Cluster '{$clusterName}' not found");
+        }
+
         $dbSettings = self::getInstance()->get("dbs.$clusterName", []);
         if (empty($targetShards)) {
             return $dbSettings;
         }
+        
         $result = [];
         foreach ($targetShards as $shard) {
             if (array_key_exists($shard, $dbSettings)) {
@@ -110,6 +135,13 @@ class Config
         return $result;
     }
 
+    /**
+     * Get shard names for a specific cluster
+     *
+     * @param string $clusterName
+     * @return array
+     * @throws \InvalidArgumentException
+     */
     public static function getShardNames($clusterName)
     {
         $dbs = self::getDatabaseSettings($clusterName);
