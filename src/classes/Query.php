@@ -36,6 +36,13 @@ class Query
     protected $errors = [];
 
     /**
+     * Connection errors
+     *
+     * @var string[]
+     */
+    protected $connectionErrors = [];
+
+    /**
      * Constructor
      *
      * @param string $sql
@@ -114,7 +121,11 @@ class Query
      */
     public function addConnection($name, $dsn, $username, $password)
     {
-        $this->connections[$name] = $this->createConnection($dsn, $username, $password);
+        try {
+            $this->connections[$name] = $this->createConnection($dsn, $username, $password);
+        } catch (\Throwable $e) {
+            $this->connectionErrors[$name] = $e->getMessage();
+        }
         return $this;
     }
 
@@ -174,7 +185,41 @@ class Query
         return [
             'rows' => array_sum($this->rowCounts),
             'results' => $results,
-            'errors' => array_values($this->errors),
+            'errors' => $this->errors,
         ];
+    }
+
+    /**
+     * Get the list of tables for a specific cluster.
+     *
+     * @param string $clusterName
+     * @return array
+     */
+    public static function getTableList($clusterName)
+    {
+        $tables = [];
+        $error = null;
+        try {
+            $sql = 'SELECT TABLE_NAME, TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = database();';
+            $query = new self($sql);
+            $query->bulkAddConnections(Config::getInstance()->getDatabaseSettings($clusterName));
+            $result = $query->query();
+            foreach ($result['results'] as $item) {
+                $shard = $item['__shard'];
+                $tableName = $item['TABLE_NAME'];
+
+                if (!isset($tables[$tableName])) {
+                    $tables[$tableName] = [
+                        'name' => $tableName,
+                        'comment' => $item['TABLE_COMMENT'],
+                        'databases' => [],
+                    ];
+                }
+                $tables[$tableName]['databases'][] = $shard;
+            }
+        } catch (\Throwable $e) {
+            $error = $e->getMessage();
+        }
+        return [$tables, $error, $query->connectionErrors];
     }
 }

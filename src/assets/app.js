@@ -748,8 +748,15 @@
         dbSelector.innerHTML = '';
         data.shardList.forEach((db, i) => {
           let option = document.createElement('option');
+          let text = db;
+          if (db in data.connectionErrors) {
+            console.error(`Connection error for shard ${db}:`, data.connectionErrors[db]);
+            text += ' ⚠ (F12 for details)';
+            option.disabled = true;
+            document.getElementById('db-has-error').innerText = '⚠';
+          }
           option.value = db;
-          option.innerHTML = db;
+          option.innerHTML = text;
           option.setAttribute('selected', true);
           dbSelector.appendChild(option);
         });

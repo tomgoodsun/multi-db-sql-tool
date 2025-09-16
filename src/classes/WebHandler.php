@@ -254,38 +254,12 @@ class WebHandler
      */
     protected function processApiInitialData()
     {
-        $tables = [];
-        $error = null;
-        try {
-            $sql = 'SELECT TABLE_NAME, TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = database();';
-            $query = new Query($sql);
-            $query->bulkAddConnections(Config::getInstance()->getDatabaseSettings($this->clusterName));
-            $result = $query->query();
-            foreach ($result['results'] as $item) {
-                $shard = $item['__shard'];
-                $tableName = $item['TABLE_NAME'];
-
-                if (!isset($tables[$tableName])) {
-                    $tables[$tableName] = [
-                        'name' => $tableName,
-                        'comment' => $item['TABLE_COMMENT'],
-                        'databases' => [],
-                    ];
-                }
-                $tables[$tableName]['databases'][] = $shard;
-            }
-        } catch (\Throwable $e) {
-            $error = $e->getMessage();
-        }
-
-        // TODO: Remove lines, because these are test data
-        //$tables['introduced_user_profile_header'] = ['name' => 'introduced_user_profile_header', 'comment' => 'Introduced User Profile Header (Unique)', 'databases' => ['shard1', 'shard2', 'shard3']];
-        //$tables['user11'] = ['name' => 'user11', 'comment' => 'User 11', 'databases' => ['shard1', 'shard2', 'shard3']];
-
+        list($tables, $error, $connectionErrors) = Query::getTableList($this->clusterName);
         $this->json([
             'cluster' => $this->clusterName,
             'shardList' => Config::getInstance()->getShardNames($this->clusterName),
             'tables' => $tables,
+            'connectionErrors' => $connectionErrors,
             'error' => $error,
         ]);
     }

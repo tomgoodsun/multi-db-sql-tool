@@ -324,6 +324,11 @@ html, body {
   font-weight: 600;
 }
 
+#db-has-error {
+  color: var(--danger-color);
+  font-weight: 600;
+}
+
 .results-tab.error {
   color: var(--danger-color);
 }
