@@ -57,11 +57,4 @@ return [
         'max_rows_per_query' => 10000,
         'max_queries_per_request' => 10,
     ],
-
-    // UI settings
-    'ui' => [
-        'theme' => 'light', // 'light' or 'dark'
-        'editor_theme' => 'default', // CodeMirror theme
-        'items_per_page' => 100,
-    ],
 ];
