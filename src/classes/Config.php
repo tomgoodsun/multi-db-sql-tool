@@ -125,7 +125,7 @@ class Config
         if (empty($targetShards)) {
             return $dbSettings;
         }
-        
+
         $result = [];
         foreach ($targetShards as $shard) {
             if (array_key_exists($shard, $dbSettings)) {

@@ -29,6 +29,16 @@ class WebHandler
     }
 
     /**
+     * Check if the request method is POST
+     *
+     * @return boolean
+     */
+    protected function isPostMethod()
+    {
+        return 'POST' === strtoupper($this->method);
+    }
+
+    /**
      * Validate the incoming request
      *
      * @return void
@@ -44,13 +54,81 @@ class WebHandler
     }
 
     /**
-     * Check if the request method is POST
+     * Basic authentication check
      *
      * @return boolean
      */
-    protected function isPostMethod()
+    protected function checkBasicAuth()
     {
-        return 'POST' === strtoupper($this->method);
+        $basicAuthConfig = Config::getInstance()->get('basic_auth', []);
+
+        if (empty($basicAuthConfig)) {
+            return true; // No auth required
+        }
+
+        if (!isset($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'])) {
+            $this->requireAuth();
+            return false;
+        }
+
+        $user = $_SERVER['PHP_AUTH_USER'];
+        $pass = $_SERVER['PHP_AUTH_PW'];
+
+        foreach ($basicAuthConfig as $credentials) {
+            if ($credentials[0] === $user && $credentials[1] === $pass) {
+                return true;
+            }
+        }
+
+        $this->requireAuth();
+        return false;
+    }
+
+    /**
+     * Send HTTP Basic Auth requirement
+     *
+     * @return void
+     */
+    protected function requireAuth()
+    {
+        header('WWW-Authenticate: Basic realm="Multi-DB SQL Tool"');
+        http_response_code(401);
+        exit('Authentication Required');
+    }
+
+    /**
+     * Apply query execution limits
+     *
+     * @return void
+     */
+    protected function applyExecutionLimits()
+    {
+        $limits = Config::getInstance()->get('limits', []);
+
+        $maxExecutionTime = $limits['max_execution_time'] ?? 30;
+        set_time_limit($maxExecutionTime);
+
+        $memoryLimit = $limits['memory_limit'] ?? '256M';
+        ini_set('memory_limit', $memoryLimit);
+    }
+
+    /**
+     * Validate query limits
+     *
+     * @param array $sqls
+     * @return boolean
+     * @throws \InvalidArgumentException
+     */
+    protected function validateQueryLimits(array $sqls)
+    {
+        $limits = Config::getInstance()->get('limits', []);
+        $maxQueries = $limits['max_queries_per_request'] ?? 10;
+
+        if (count($sqls) > $maxQueries) {
+            throw new \InvalidArgumentException("Too many queries. Maximum {$maxQueries} allowed.");
+        }
+
+        return true;
     }
 
     /**
@@ -78,46 +156,77 @@ class WebHandler
             $this->json(['error' => 'Method Not Allowed']);
         }
 
-        $resultSet = [];
-        $targetShards = $_REQUEST['shards'] ?? [];
-        $reqSql = $_REQUEST['sql'] ?? '';
+        try {
+            $this->applyExecutionLimits();
 
-        $sqls = Utility::splitSqlStatements($reqSql);
+            $resultSet = [];
+            $targetShards = $_REQUEST['shards'] ?? [];
+            $reqSql = $_REQUEST['sql'] ?? '';
 
-        $hasError = false;
-        $id = 1;
-        foreach ($sqls as $sql) {
-            $result = [];
-            $error = null;
-            try {
-                $dbSettings = Config::getInstance()->getDatabaseSettings($this->clusterName, $targetShards);
-                $query = new Query($sql);
-                $query->bulkAddConnections($dbSettings);
-                $result = $query->query();
-            } catch (\Throwable $e) {
-                $error = $e->getMessage();
-                $hasError = true;
+            if (empty(trim($reqSql))) {
+                $this->json(['error' => 'SQL query is required']);
             }
 
-            $result += [
-                'error' => $error,
-                'results' => [],
-                'rows' => 0,
-                'sql' => $sql,
-                'id' => $id,
-            ];
+            $sqls = Utility::splitSqlStatements($reqSql);
+            $this->validateQueryLimits($sqls);
 
-            $resultSet[] = $result;
-            $id++;
+            // Read-only mode validation
+            if (Config::getInstance()->isReadOnlyMode()) {
+                if (!Utility::canExecuteQuery($reqSql)) {
+                    $this->json(['error' => 'Query not allowed in read-only mode']);
+                }
+            }
+
+            $hasError = false;
+            $id = 1;
+            $totalRows = 0;
+
+            foreach ($sqls as $sql) {
+                $result = [];
+                $error = null;
+                $executionTime = 0;
+
+                try {
+                    $startTime = microtime(true);
+
+                    $dbSettings = Config::getInstance()->getDatabaseSettings($this->clusterName, $targetShards);
+                    $query = new Query($sql);
+                    $query->bulkAddConnections($dbSettings);
+                    $result = $query->query();
+
+                    $executionTime = round((microtime(true) - $startTime) * 1000, 2); // ms
+                    $totalRows += $result['rows'];
+                } catch (\Throwable $e) {
+                    $error = $e->getMessage();
+                    $hasError = true;
+                }
+
+                $result += [
+                    'error' => $error,
+                    'results' => $result['results'] ?? [],
+                    'rows' => $result['rows'] ?? 0,
+                    'errors' => $result['errors'] ?? [],
+                    'sql' => $sql,
+                    'id' => $id,
+                    'executionTime' => $executionTime,
+                ];
+
+                $resultSet[] = $result;
+                $id++;
+            }
+
+            $this->sessionManager->addQueryHistory($reqSql, $this->clusterName);
+
+            $this->json([
+                'cluster' => $this->clusterName,
+                'resultSet' => $resultSet,
+                'hasError' => $hasError,
+                'totalRows' => $totalRows,
+                'queryCount' => count($sqls)
+            ]);
+        } catch (\Throwable $e) {
+            $this->json(['error' => $e->getMessage()]);
         }
-
-        $this->sessionManager->addQueryHistory($reqSql, $this->clusterName);
-
-        $this->json([
-            'cluster' => $this->clusterName,
-            'resultSet' => $resultSet,
-            'hasError' => $hasError
-        ]);
     }
 
     /**
@@ -195,7 +304,8 @@ class WebHandler
         $optionalName = Config::getInstance()->get('optional_name', '');
         $optionalName = $optionalName ? " for {$optionalName}" : '';
         $clausterList = Config::getInstance()->getClusterNames();
-        $readOnlyMode = Config::getInstance()->get('readonly_mode', true);
+        $readOnlyMode = Config::getInstance()->isReadOnlyMode();
+
         require_once __DIR__ . '/../assets/template/index.inc.html';
     }
 
@@ -206,19 +316,33 @@ class WebHandler
      */
     public function execute()
     {
-        switch ($this->action) {
-            case 'api_query':
-                $this->processApiQuery();
-                break;
-            case 'api_history':
-                $this->processApiHistory();
-                break;
-            case 'api_initial_data':
-                $this->processApiInitialData();
-                break;
-            default:
-                $this->processWeb();
-                break;
+        try {
+            // Basic authentication check
+            if (!$this->checkBasicAuth()) {
+                return;
+            }
+
+            switch ($this->action) {
+                case 'api_query':
+                    $this->processApiQuery();
+                    break;
+                case 'api_history':
+                    $this->processApiHistory();
+                    break;
+                case 'api_initial_data':
+                    $this->processApiInitialData();
+                    break;
+                default:
+                    $this->processWeb();
+                    break;
+            }
+        } catch (\Throwable $e) {
+            if ($this->action && strpos($this->action, 'api_') === 0) {
+                $this->json(['error' => 'Internal server error']);
+            } else {
+                http_response_code(500);
+                echo 'Internal Server Error';
+            }
         }
     }
 }
