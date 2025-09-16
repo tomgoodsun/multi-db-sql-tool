@@ -179,16 +179,24 @@
 
     try {
       // POST / API call to execute SQL
-      let postData = new FormData();
-      postData.append('action', 'api_query');
-      postData.append('cluster', getCurrentCluster());
+      let postData = [];
+      postData.push('action=api_query');
+      postData.push('cluster=' + encodeURIComponent(getCurrentCluster()));
       getTargetShards().forEach(db => {
-        postData.append('shards[]', db);
+        postData.push('shards[]=' + encodeURIComponent(db));
       });
-      postData.append('sql', sql);
+      postData.push('sql=' + encodeURIComponent(sql));
+
+      let reqData = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: postData.join('&')
+      };
 
       // This API call must user POST method to avoid URL length limit
-      fetch('', {method: 'POST', body: postData})
+      fetch('', reqData)
         .then(response => response.json())
         .then(data => {
           if (data.hasError) {
