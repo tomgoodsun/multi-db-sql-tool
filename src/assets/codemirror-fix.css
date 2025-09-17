@@ -1,0 +1,65 @@
+/* CodeMirror 高さ制限問題の修正 - 既存のapp.cssに対する追加/変更のみ */
+
+/* ==========================================================================
+   CodeMirror Height Fix - 既存スタイルの修正
+   ========================================================================== */
+
+/* .sql-editor-container の修正 */
+.sql-editor-container {
+  border: 1px solid #ddd;
+  flex: 1;
+  height: calc(100% - 50px);
+  /* 追加: 最大高さを制限 */
+  max-height: calc(100% - 50px);
+  /* 追加: オーバーフローを隠す */
+  overflow: hidden;
+  position: relative;
+}
+
+/* .CodeMirror の修正 */
+.CodeMirror {
+  border: none;
+  border-radius: 4px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 12px;
+  height: 100% !important;
+  /* 追加: 最大高さを制限 */
+  max-height: 100% !important;
+  /* 追加: オーバーフローを隠す */
+  overflow: hidden;
+  width: 100% !important;
+}
+
+/* .CodeMirror-scroll の修正 */
+.CodeMirror-scroll {
+  height: 100% !important;
+  /* 追加: 最大高さを制限 */
+  max-height: 100% !important;
+  overflow: auto !important;
+}
+
+/* .CodeMirror-sizer の修正 */
+.CodeMirror-sizer {
+  /* 変更: 自動拡張を防止 */
+  min-height: auto !important;
+}
+
+/* .editor-container の修正 */
+.editor-container {
+  height: 30%;
+  /* 追加: 最大高さを制限してビューポートの半分を超えないように */
+  max-height: 50vh;
+  /* 追加: 最小高さを保証 */
+  min-height: 200px;
+  /* 追加: オーバーフローを隠す */
+  overflow: hidden;
+}
+
+/* .result-container の修正 */
+.result-container {
+  height: 70%;
+  /* 追加: 最小高さを保証 */
+  min-height: 300px;
+  /* 追加: オーバーフローを隠す */
+  overflow: hidden;
+}
