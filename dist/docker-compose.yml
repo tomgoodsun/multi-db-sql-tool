@@ -1,0 +1,13 @@
+#version: '3.8'
+services:
+  web:
+    build: .
+    ports:
+      - "8081:80"
+    volumes:
+      - ./html:/var/www/html
+    networks:
+      - multi-db-network
+networks:
+  multi-db-network:
+    driver: bridge
