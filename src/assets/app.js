@@ -555,6 +555,48 @@
         let targetId = evt.target.dataset.target;
         activateResultTab(targetId);
       });
+
+      // Copy to clipboard button
+      // Use tooltip and show "Copy results as TSV to clipboard" message when hovered
+      // After clicked, show "Copied!" tooltip and fade out after 2 seconds
+      let copyBtn = document.createElement('a');
+      copyBtn.className = 'copy-btn';
+      copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+      copyBtn.href = 'javascript:void(0);';
+      copyBtn.title = 'Copy results as TSV to clipboard';
+      copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+
+      // TODO: Conflicts with copy complete message tooltip
+      //copyBtn.addEventListener('mouseover', () => {
+      //  let tooltip = bootstrap.Tooltip.getInstance(copyBtn);
+      //  if (!tooltip) {
+      //    tooltip = new bootstrap.Tooltip(copyBtn);
+      //  }
+      //  tooltip.show();
+      //});
+      //copyBtn.addEventListener('mouseout', () => {
+      //  let tooltip = bootstrap.Tooltip.getInstance(copyBtn);
+      //  if (tooltip) {
+      //    tooltip.hide();
+      //  }
+      //});
+
+      copyBtn.addEventListener('click', evt => {
+        evt.stopPropagation();
+        copyTsvToClipboard(id);
+        copyBtn.title = 'Copied result of this tab as TSV!';
+        let tooltip = bootstrap.Tooltip.getInstance(copyBtn);
+        if (!tooltip) {
+          tooltip = new bootstrap.Tooltip(copyBtn);
+        }
+        tooltip.show();
+        setTimeout(() => {
+          tooltip.hide();
+          copyBtn.title = 'Copy results as TSV to clipboard';
+        }, 2000);
+      });
+      tabBtn.appendChild(copyBtn);
+
       tabArea.appendChild(tabBtn);
 
       // Tab panel format (error + grid), no error-list if no error
@@ -589,6 +631,50 @@
   };
 
   // ------------------------------------------------------------
+
+  /**
+   * Copy results as TSV to clipboard
+   *
+   * Coprying multiple selected cells as TSV is not supported on ag-Grid Community Edition.
+   * Enterprise Edition supports it.
+   * This functionality is implemented manually here.
+   *
+   * @param {string} targetResultId
+   * @returns {void}
+   */
+  let copyTsvToClipboard = (targetResultId) => {
+    if (!currentResults || 0 === Object.keys(currentResults).length) {
+      showAlert('No results to copy', 'warning');
+      return;
+    }
+
+    let dataToTsv = [];
+    let results = currentResults.resultSet.find(item => item.id === targetResultId);
+    if (!results || 0 === results.results.length) {
+      showAlert('No results to copy', 'warning');
+      return;
+    }
+
+    let headers = Object.keys(results.results[0]);
+    dataToTsv.push(headers.join('\t'));
+
+    results.results.forEach(row => {
+      let rowValues = headers.map(header => {
+        let value = row[header] || '';
+        return String(value).replace(/\t/g, ' ').replace(/\n/g, ' ');
+      });
+      dataToTsv.push(rowValues.join('\t'));
+    });
+    let tsvContent = dataToTsv.join('\n');
+
+    navigator.clipboard.writeText(tsvContent).then(() => {
+      //showAlert('Results copied to clipboard', 'success');
+      console.log('Results copied to clipboard');
+    }).catch(err => {
+      showAlert('Failed to copy results: ' + err.message, 'danger');
+      console.error('Clipboard copy error:', err);
+    });
+  };
 
   /**
    * Export results to CSV

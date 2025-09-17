@@ -340,6 +340,9 @@ html, body {
 .results-tab:not(.error) i {
   color: var(--success-color);
 }
+.results-tab .copy-btn {
+  margin-left: 5px;
+}
 
 .results-content {
   flex: 1;
