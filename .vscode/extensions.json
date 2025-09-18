@@ -1,0 +1,13 @@
+{
+    "recommendations": [
+        "devsense.composer-php-vscode",
+        "ms-azuretools.vscode-docker",
+        "mikestead.dotenv",
+        "editorconfig.editorconfig",
+        "yzhang.markdown-all-in-one",
+        "davidanson.vscode-markdownlint",
+        "christian-kohler.path-intellisense",
+        "neilbrayfield.php-docblocker",
+        "bmewburn.vscode-intelephense-client"
+    ]
+}
