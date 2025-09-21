@@ -16,6 +16,8 @@ class Config
     const DEFAULT_SESSION_LIFETIME = 86400; // 1 day
     const MAX_QUERY_HISTORY = 50;
 
+    private static $instance = null;
+
     protected $settings = [];
 
     /**
@@ -46,11 +48,23 @@ class Config
      */
     public static function getInstance()
     {
-        static $instance;
-        if (null === $instance) {
-            $instance = new self();
+        if (null === self::$instance) {
+            self::$instance = new self();
         }
-        return $instance;
+        return self::$instance;
+    }
+
+    /**
+     * Initialize the configuration.
+     *
+     * @param string|null $configPath
+     * @return void
+     */
+    public static function initialize($configPath = null)
+    {
+        if (null === self::$instance) {
+            self::$instance = new self($configPath);
+        }
     }
 
     /**
