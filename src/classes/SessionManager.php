@@ -12,7 +12,7 @@ class SessionManager
     }
 
     /**
-     * セッション開始
+     * Start the session if not already started
      *
      * @return void
      */
@@ -29,7 +29,7 @@ class SessionManager
     }
 
     /**
-     * クエリ履歴に追加
+     * Add a query to the history.
      *
      * @param string $sql
      * @param string $clusterName
@@ -49,7 +49,7 @@ class SessionManager
             'formattedTime' => date(DATE_W3C),
         ];
 
-        // 重複チェック（直前の履歴と同じ場合は追加しない）
+        // Check for duplicate (do not add if same as last history)
         foreach ($queryHistory as $item) {
             if ($item['sql'] === $sql) {
                 return;
@@ -58,13 +58,13 @@ class SessionManager
 
         array_unshift($queryHistory, $historyItem);
 
-        // 履歴数制限
+        // Limit history size
         $maxHistory = Config::getInstance()->get('session.max_history', Config::MAX_QUERY_HISTORY);
         $_SESSION['query_history'] = array_slice($queryHistory, 0, $maxHistory);
     }
 
     /**
-     * クエリ履歴を取得
+     * Get the query history.
      *
      * @return array
      */
@@ -74,7 +74,7 @@ class SessionManager
     }
 
     /**
-     * クエリ履歴をクリア
+     * Clear the query history.
      *
      * @return void
      */
@@ -84,7 +84,7 @@ class SessionManager
     }
 
     /**
-     * セッションを破棄
+     * Destroy the session.
      *
      * @return void
      */
