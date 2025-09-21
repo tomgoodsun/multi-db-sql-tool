@@ -267,9 +267,10 @@ class WebHandler
     /**
      * Normal web request handler
      *
+     * @param callable|null $templateFunction
      * @return void
      */
-    protected function processWeb()
+    protected function processWeb($templateFunction = null)
     {
         $appName = Config::APP_NAME;
         $appShortName = Config::APP_SHORT_NAME;
@@ -280,15 +281,27 @@ class WebHandler
         $clausterList = Config::getInstance()->getClusterNames();
         $readOnlyMode = Config::getInstance()->isReadOnlyMode();
 
-        require_once __DIR__ . '/../assets/template/index.inc.html';
+        if (is_callable($templateFunction)) {
+            $templateFunction(compact(
+                'appName',
+                'appShortName',
+                'appShortNameLower',
+                'version',
+                'optionalName',
+                'clausterList',
+                'readOnlyMode'
+            ));
+            return;
+        }
     }
 
     /**
      * Main execution function
      *
+     * @param callable|null $templateFunction
      * @return void
      */
-    public function execute()
+    public function execute($templateFunction = null)
     {
         try {
             // Basic authentication check
@@ -307,7 +320,7 @@ class WebHandler
                     $this->processApiInitialData();
                     break;
                 default:
-                    $this->processWeb();
+                    $this->processWeb($templateFunction);
                     break;
             }
         } catch (\Throwable $e) {
