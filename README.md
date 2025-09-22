@@ -53,6 +53,14 @@ http://localhost:8080
 - Three databases as sharding-architecture
 - Each database has two tables, `users` and `orders`
 
+### How to build
+
+```bash
+docker-compose exec web php build.php
+```
+
+`dist/index.php` is generated with included classes, CSS and JavaScript.
+
 ## Frontend Libraries
 
 - [Normalize.css](https://necolas.github.io/normalize.css/)
