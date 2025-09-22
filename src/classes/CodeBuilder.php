@@ -6,6 +6,11 @@ class CodeBuilder
 {
     private $sourceDir;
     private $outputFile;
+    private $copyFiles = [
+        'favicon.ico',
+        'favicon.svg',
+        'config.sample.php',
+    ];
     private $requires = [];
     private $indexResultLines = [];
     private $builtContent = "<?php\n\nnamespace MultiDbSqlTool;\n\n";
@@ -37,6 +42,7 @@ class CodeBuilder
         }
         $this->builtContent .= "\n" . implode("\n", $this->indexResultLines) . "\n";
         $this->writeOutput();
+        $this->copyFiles();
     }
 
     /**
@@ -76,7 +82,7 @@ class CodeBuilder
                 } else {
                     $this->indexResultLines[] = $line;
                 }
-            } elseif (preg_match('/^<script\s.*src=["\'](.*)["\'].*><\/script>/', $trimmedLine, $matches)) {
+            } elseif (preg_match('/^<script\s.*src=["\'](.*\.js)["\'].*><\/script>/', $trimmedLine, $matches)) {
                 $jsPath = $matches[1];
                 if (file_exists($this->sourceDir . '/' . $jsPath)) {
                     $jsContent = file_get_contents($this->sourceDir . '/' . $jsPath);
@@ -110,11 +116,35 @@ class CodeBuilder
         return trim($content);
     }
 
+    /**
+     * Write the output to the specified file
+     *
+     * @return void
+     */
     private function writeOutput()
     {
         file_put_contents($this->outputFile, $this->builtContent);
         echo "Build complete!\n";
         echo "📁 Output: {$this->outputFile}\n";
         echo "📦 Size: " . number_format(filesize($this->outputFile) / 1024, 1) . " KB\n"   ;
+    }
+
+    /**
+     * Copy necessary files to the output directory
+     *
+     * @return void
+     */
+    private function copyFiles()
+    {
+        foreach ($this->copyFiles as $file) {
+            $src = $this->sourceDir . '/' . $file;
+            $dest = dirname($this->outputFile) . '/' . $file;
+            if (file_exists($src)) {
+                copy($src, $dest);
+                echo "Copied file: {$file}\n";
+            } else {
+                echo "File not found, skipping: {$file}\n";
+            }
+        }
     }
 }
