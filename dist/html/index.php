@@ -942,7 +942,6 @@ function main()
   <link href="//cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css" rel="stylesheet">
   <link href="//cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/eclipse.min.css" rel="stylesheet">
 
-  <!-- AG Grid -->
   <link href="//cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-grid.min.css" rel="stylesheet">
   <link href="//cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-theme-alpine.min.css" rel="stylesheet">
 
