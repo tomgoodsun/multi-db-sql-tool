@@ -24,7 +24,6 @@ function main()
   <link rel="alternate icon" href="favicon.ico">
 
   <!-- CSS Libraries -->
-  <!--
   <link href="//cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css" rel="stylesheet">
   <link href="//cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
   <link href="//cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -33,10 +32,8 @@ function main()
 
   <link href="//cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-grid.min.css" rel="stylesheet">
   <link href="//cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-theme-alpine.min.css" rel="stylesheet">
-  -->
 
   <!-- Custom CSS -->
-  <link href="assets/vendor/vendor.css" rel="stylesheet">
   <link href="assets/app.css" rel="stylesheet">
   <link href="assets/codemirror-fix.css" rel="stylesheet">
 </head>
@@ -258,7 +255,6 @@ function main()
 
 
   <!-- JavaScript Libraries -->
-  <!--
   <script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
   <script src="//cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.js"></script>
@@ -266,7 +262,6 @@ function main()
   <script src="//cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/dist/ag-grid-community.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/sql-formatter@15.6.8/dist/sql-formatter.min.js"></script>
-  -->
 
   <script>
     window.MultiDbSql = {
@@ -279,7 +274,6 @@ function main()
 
   <!-- Custom JavaScript -->
   <script src="assets/app.js"></script>
-  <script src="assets/vendor/vendor.js"></script>
 </body>
 </html>
         <?php
