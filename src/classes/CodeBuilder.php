@@ -5,11 +5,14 @@ namespace MultiDbSqlTool;
 class CodeBuilder
 {
     private $sourceDir;
+    private $outputDir;
     private $outputFile;
     private $copyFiles = [
         'favicon.ico',
         'favicon.svg',
         'config.sample.php',
+        'assets/vendor/vendor.css',
+        'assets/vendor/vendor.js',
     ];
     private $requires = [];
     private $indexResultLines = [];
@@ -25,6 +28,7 @@ class CodeBuilder
     {
         $this->sourceDir = rtrim($sourceDir, '/');
         $this->outputFile = $outputFile;
+        $this->outputDir = dirname($outputFile);
     }
 
     /**
@@ -58,6 +62,22 @@ class CodeBuilder
         }
 
         $content = file_get_contents($indexFile);
+
+        // Replace if ($cssDevMode) or ($jsDevMode) block with vendor scripts/styles
+        $content = preg_replace_callback('/<\?php if \(\$cssDevMode\): \?>(.*?)<\?php endif; \?>/s', function ($matches) {
+            $cssPath = 'assets/vendor/vendor.css';
+            //$cssContent = file_get_contents($this->sourceDir . '/' . $cssPath);
+            //return sprintf("<style>\n/* %s */\n%s\n</style>", $cssPath, $cssContent);
+            return sprintf('<link rel="stylesheet" href="%s">', $cssPath);
+        }, $content);
+        $content = preg_replace_callback('/<\?php if \(\$jsDevMode\): \?> (.*?) <\?php endif; \?>/s', function ($matches) {
+            // vendor.js includes <?xml ... which is read as PHP tag
+            $jsPath = 'assets/vendor/vendor.js';
+            //$jsContent = file_get_contents($this->sourceDir . '/' . $jsPath);
+            //return sprintf("<script>\n/* %s */\n%s\n</script>", $jsPath, $jsContent);
+            return sprintf('<script src="%s"></script>', $jsPath);
+        }, $content);
+
         $lines = explode("\n", $content);
         $lineCount = 0;
 
@@ -138,7 +158,11 @@ class CodeBuilder
     {
         foreach ($this->copyFiles as $file) {
             $src = $this->sourceDir . '/' . $file;
-            $dest = dirname($this->outputFile) . '/' . $file;
+            $dest = $this->outputDir . '/' . $file;
+            $destDir = dirname($dest);
+            if (!is_dir($destDir)) {
+                mkdir($destDir, 0755, true);
+            }
             if (file_exists($src)) {
                 copy($src, $dest);
                 echo "Copied file: {$file}\n";
