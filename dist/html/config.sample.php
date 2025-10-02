@@ -57,4 +57,14 @@ return [
         'max_rows_per_query' => 10000,
         'max_queries_per_request' => 10,
     ],
+
+    // CSS development mode
+    // true: Use unminified CSS (slower, for debugging)
+    // false: Use minified CSS (faster)
+    'css_dev_mode' => false,
+
+    // JS development mode
+    // true: Use unminified JS (slower, for debugging)
+    // false: Use minified JS (faster)
+    'js_dev_mode' => false,
 ];
