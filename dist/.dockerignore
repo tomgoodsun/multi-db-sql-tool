@@ -1,0 +1,26 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+.env
+.nyc_output
+coverage
+.vscode
+.idea
+
+# NPMビルド関連
+package*.json
+webpack.config.js
+vendor-entry.js
+
+# 開発ファイル
+.editorconfig
+composer.json
+docker-compose.override.yml
+build.php
+
+# distディレクトリのREADMEとビルドスクリプト（実行時不要）
+dist/README.md
+dist/build.sh
+dist/build.bat
+dist/docker-compose.yml
