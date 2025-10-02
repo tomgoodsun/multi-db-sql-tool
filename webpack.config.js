@@ -55,16 +55,6 @@ module.exports = (env, argv) => {
         new TerserPlugin(),
         new CssMinimizerPlugin()
       ]
-    } : {},
-
-    externals: {
-      // これらのライブラリをグローバル変数として公開
-      'jQuery': 'jQuery',
-      'bootstrap': 'bootstrap',
-      'CodeMirror': 'CodeMirror',
-      'agGrid': 'agGrid',
-      'XLSX': 'XLSX',
-      'sqlFormatter': 'sqlFormatter'
-    }
+    } : {}
   };
 };
