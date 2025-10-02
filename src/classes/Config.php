@@ -171,4 +171,24 @@ class Config
     {
         return (bool)self::getInstance()->get('readonly_mode', false);
     }
+
+    /**
+     * Check if the application is in CSS development mode.
+     *
+     * @return bool
+     */
+    public static function cssDevMode()
+    {
+        return (bool)self::getInstance()->get('css_dev_mode', false);
+    }
+
+    /**
+     * Check if the application is in JavaScript development mode.
+     *
+     * @return bool
+     */
+    public static function jsDevMode()
+    {
+        return (bool)self::getInstance()->get('js_dev_mode', false);
+    }
 }
