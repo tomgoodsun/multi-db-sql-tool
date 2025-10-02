@@ -1,13 +1,34 @@
-#version: '3.8'
+version: '3.8'
+
 services:
-  web:
-    build: .
+  multi-db-sql-tool:
+    build:
+      context: ..
+      dockerfile: dist/Dockerfile
     ports:
-      - "8081:80"
+      - "8080:80"
     volumes:
-      - ./html:/var/www/html
-    networks:
-      - multi-db-network
-networks:
-  multi-db-network:
-    driver: bridge
+      # 設定ファイルをマウント（必要に応じてコメントアウトを外す）
+      # - ./config.php:/var/www/html/config.php:ro
+    environment:
+      - PHP_ENV=production
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    
+  # 開発・テスト用MySQL
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: testuser
+      MYSQL_PASSWORD: testpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
