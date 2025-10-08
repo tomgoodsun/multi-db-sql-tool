@@ -5,11 +5,16 @@ namespace MultiDbSqlTool;
 class CodeBuilder
 {
     private $sourceDir;
+    private $outputDir;
     private $outputFile;
     private $copyFiles = [
         'favicon.ico',
         'favicon.svg',
         'config.sample.php',
+        'assets/vendor/vendor.css',
+        'assets/vendor/vendor.js',
+        'assets/vendor/fonts/bootstrap-icons.woff',
+        'assets/vendor/fonts/bootstrap-icons.woff2',
     ];
     private $requires = [];
     private $indexResultLines = [];
@@ -25,6 +30,7 @@ class CodeBuilder
     {
         $this->sourceDir = rtrim($sourceDir, '/');
         $this->outputFile = $outputFile;
+        $this->outputDir = dirname($outputFile);
     }
 
     /**
@@ -41,6 +47,7 @@ class CodeBuilder
             $this->builtContent .= "\n" . $this->readClassFile($file) . "\n";
         }
         $this->builtContent .= "\n" . implode("\n", $this->indexResultLines) . "\n";
+        $this->builtContent = $this->readAssets();
         $this->writeOutput();
         $this->copyFiles();
     }
@@ -58,6 +65,7 @@ class CodeBuilder
         }
 
         $content = file_get_contents($indexFile);
+
         $lines = explode("\n", $content);
         $lineCount = 0;
 
@@ -74,22 +82,6 @@ class CodeBuilder
 
             if (preg_match('/^require_once\s.*(\/classes\/.*\.php)/', $trimmedLine, $matches)) {
                 $this->requires[] = $this->sourceDir . '/' . $matches[1];
-            } elseif (preg_match('/^<link\s.*href=["\'](.*\.css)["\'].*>/', $trimmedLine, $matches)) {
-                $cssPath = $matches[1];
-                if (file_exists($this->sourceDir . '/' . $cssPath)) {
-                    $cssContent = file_get_contents($this->sourceDir . '/' . $cssPath);
-                    $this->indexResultLines[] = sprintf("<style>\n/* %s */\n%s\n</style>", $cssPath, $cssContent);
-                } else {
-                    $this->indexResultLines[] = $line;
-                }
-            } elseif (preg_match('/^<script\s.*src=["\'](.*\.js)["\'].*><\/script>/', $trimmedLine, $matches)) {
-                $jsPath = $matches[1];
-                if (file_exists($this->sourceDir . '/' . $jsPath)) {
-                    $jsContent = file_get_contents($this->sourceDir . '/' . $jsPath);
-                    $this->indexResultLines[] = sprintf("<script>\n/* %s */\n%s\n</script>", $jsPath, $jsContent);
-                } else {
-                    $this->indexResultLines[] = $line;
-                }
             } else {
                 $this->indexResultLines[] = $line;
             }
@@ -117,6 +109,43 @@ class CodeBuilder
     }
 
     /**
+     * Read the assets and inline them
+     *
+     * @return string
+     */
+    private function readAssets()
+    {
+        $content = $this->builtContent;
+
+        // Replace if ($cssDevMode) or ($jsDevMode) block with vendor scripts/styles
+        $cssPath = 'assets/vendor/vendor.css';
+        $cssContent = sprintf('<link rel="stylesheet" href="%s">', $cssPath);
+        $content = preg_replace('/<\?php if \(\$cssDevMode\): \?>(.*?)<\?php endif; \?>/s', $cssContent, $content);
+
+        // vendor.js includes <?xml which breaks the PHP parser, so we replace the whole block
+        $jsPath = 'assets/vendor/vendor.js';
+        $jsContent = sprintf('<script src="%s"></script>', $jsPath);
+        $content = preg_replace('/<\?php if \(\$jsDevMode\): \?>(.*?)<\?php endif; \?>/s', $jsContent, $content);
+
+        $cssPath = 'assets/app.css';
+        $cssContent = file_get_contents($this->sourceDir . '/' . $cssPath);
+        $cssContent = sprintf("<style>\n/* %s */\n%s\n</style>", $cssPath, $cssContent);
+        $content = preg_replace('/<link\s.*href=["\'](assets\/app\.css)["\'].*>/', $cssContent, $content);
+
+        $cssPath = 'assets/codemirror-fix.css';
+        $cssContent = file_get_contents($this->sourceDir . '/' . $cssPath);
+        $cssContent = sprintf("<style>\n/* %s */\n%s\n</style>", $cssPath, $cssContent);
+        $content = preg_replace('/<link\s.*href=["\'](assets\/codemirror-fix\.css)["\'].*>/', $cssContent, $content);
+
+        $jsPath = 'assets/app.js';
+        $jsContent = file_get_contents($this->sourceDir . '/' . $jsPath);
+        $jsContent = sprintf("<script>\n/* %s */\n%s\n</script>", $jsPath, $jsContent);
+        $content = preg_replace('/<script\s.*src=["\'](assets\/app\.js)["\'].*><\/script>/', $jsContent, $content);
+
+        return trim($content);
+    }
+
+    /**
      * Write the output to the specified file
      *
      * @return void
@@ -138,7 +167,11 @@ class CodeBuilder
     {
         foreach ($this->copyFiles as $file) {
             $src = $this->sourceDir . '/' . $file;
-            $dest = dirname($this->outputFile) . '/' . $file;
+            $dest = $this->outputDir . '/' . $file;
+            $destDir = dirname($dest);
+            if (!is_dir($destDir)) {
+                mkdir($destDir, 0755, true);
+            }
             if (file_exists($src)) {
                 copy($src, $dest);
                 echo "Copied file: {$file}\n";

@@ -172,6 +172,26 @@ class Config
     {
         return (bool)self::getInstance()->get('readonly_mode', false);
     }
+
+    /**
+     * Check if the application is in CSS development mode.
+     *
+     * @return bool
+     */
+    public static function cssDevMode()
+    {
+        return (bool)self::getInstance()->get('css_dev_mode', false);
+    }
+
+    /**
+     * Check if the application is in JavaScript development mode.
+     *
+     * @return bool
+     */
+    public static function jsDevMode()
+    {
+        return (bool)self::getInstance()->get('js_dev_mode', false);
+    }
 }
 
 class SessionManager
@@ -862,6 +882,8 @@ class WebHandler
         $optionalName = $optionalName ? " for {$optionalName}" : '';
         $clausterList = Config::getInstance()->getClusterNames();
         $readOnlyMode = Config::getInstance()->isReadOnlyMode();
+        $cssDevMode = Config::getInstance()->cssDevMode();
+        $jsDevMode = Config::getInstance()->jsDevMode();
 
         if (is_callable($templateFunction)) {
             $templateFunction(compact(
@@ -871,7 +893,9 @@ class WebHandler
                 'version',
                 'optionalName',
                 'clausterList',
-                'readOnlyMode'
+                'readOnlyMode',
+                'cssDevMode',
+                'jsDevMode'
             ));
             return;
         }
@@ -935,18 +959,9 @@ function main()
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="alternate icon" href="favicon.ico">
 
-  <!-- CSS Libraries -->
-  <link href="//cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css" rel="stylesheet">
-  <link href="//cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-  <link href="//cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
-  <link href="//cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css" rel="stylesheet">
-  <link href="//cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/eclipse.min.css" rel="stylesheet">
+<link rel="stylesheet" href="assets/vendor/vendor.css">
 
-  <link href="//cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-grid.min.css" rel="stylesheet">
-  <link href="//cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-theme-alpine.min.css" rel="stylesheet">
-
-  <!-- Custom CSS -->
-<style>
+  <style>
 /* assets/app.css */
 /* Multi-DB SQL Tool Styles */
 
@@ -1552,7 +1567,7 @@ body {
   }
 }
 </style>
-<style>
+  <style>
 /* assets/codemirror-fix.css */
 /* ==========================================================================
    CodeMirror Height Fix
@@ -1616,6 +1631,7 @@ body {
 }
 
 </style>
+
 </head>
 <body>
 
@@ -1833,15 +1849,7 @@ body {
     </div>
   </div>
 
-
-  <!-- JavaScript Libraries -->
-  <script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-  <script src="//cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/sql/sql.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/dist/ag-grid-community.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/sql-formatter@15.6.8/dist/sql-formatter.min.js"></script>
+<script src="assets/vendor/vendor.js"></script>
 
   <script>
     window.MultiDbSql = {
@@ -1849,11 +1857,13 @@ body {
       appShortNameLower: '<?php echo $appShortNameLower; ?>',
       version: '<?php echo $version; ?>',
       isReadOnlyMode: <?php echo $readOnlyMode ? 'true' : 'false'; ?>,
+      cssDevMode: <?php echo $cssDevMode ? 'true' : 'false'; ?>,
+      jsDevMode: <?php echo $jsDevMode ? 'true' : 'false'; ?>,
     };
   </script>
 
   <!-- Custom JavaScript -->
-<script>
+  <script>
 /* assets/app.js */
 (function(window, document) {
   let dbSelector = document.getElementById('db-selector');
@@ -2760,4 +2770,3 @@ body {
 }
 
 main();
-

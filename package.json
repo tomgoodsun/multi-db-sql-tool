@@ -1,0 +1,30 @@
+{
+  "name": "multi-db-sql-tool",
+  "version": "1.0.0-alpha",
+  "description": "Multi-database SQL execution tool with unified interface",
+  "scripts": {
+    "build": "webpack --mode=production",
+    "build:dev": "webpack --mode=development",
+    "watch": "webpack --mode=development --watch",
+    "clean": "rimraf src/assets/vendor"
+  },
+  "devDependencies": {
+    "css-loader": "^6.8.0",
+    "css-minimizer-webpack-plugin": "^5.0.0",
+    "mini-css-extract-plugin": "^2.7.0",
+    "rimraf": "^5.0.0",
+    "terser-webpack-plugin": "^5.3.0",
+    "webpack": "^5.88.0",
+    "webpack-cli": "^5.1.0"
+  },
+  "dependencies": {
+    "ag-grid-community": "^31.0.0",
+    "bootstrap": "^5.3.2",
+    "bootstrap-icons": "^1.11.0",
+    "codemirror": "^5.65.16",
+    "jquery": "^3.7.1",
+    "normalize.css": "^8.0.1",
+    "sql-formatter": "^15.3.2",
+    "xlsx": "^0.18.5"
+  }
+}

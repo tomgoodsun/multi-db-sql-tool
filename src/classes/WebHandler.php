@@ -280,6 +280,8 @@ class WebHandler
         $optionalName = $optionalName ? " for {$optionalName}" : '';
         $clausterList = Config::getInstance()->getClusterNames();
         $readOnlyMode = Config::getInstance()->isReadOnlyMode();
+        $cssDevMode = Config::getInstance()->cssDevMode();
+        $jsDevMode = Config::getInstance()->jsDevMode();
 
         if (is_callable($templateFunction)) {
             $templateFunction(compact(
@@ -289,7 +291,9 @@ class WebHandler
                 'version',
                 'optionalName',
                 'clausterList',
-                'readOnlyMode'
+                'readOnlyMode',
+                'cssDevMode',
+                'jsDevMode'
             ));
             return;
         }

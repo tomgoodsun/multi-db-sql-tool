@@ -23,6 +23,7 @@ function main()
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="alternate icon" href="favicon.ico">
 
+<?php if ($cssDevMode): ?>
   <!-- CSS Libraries -->
   <link href="//cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css" rel="stylesheet">
   <link href="//cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
@@ -32,10 +33,13 @@ function main()
 
   <link href="//cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-grid.min.css" rel="stylesheet">
   <link href="//cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-theme-alpine.min.css" rel="stylesheet">
+<?php else: ?>
+  <link href="assets/vendor/vendor.css" rel="stylesheet">
+<?php endif; ?>
 
-  <!-- Custom CSS -->
   <link href="assets/app.css" rel="stylesheet">
   <link href="assets/codemirror-fix.css" rel="stylesheet">
+
 </head>
 <body>
 
@@ -253,7 +257,7 @@ function main()
     </div>
   </div>
 
-
+<?php if ($jsDevMode): ?>
   <!-- JavaScript Libraries -->
   <script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
@@ -262,6 +266,10 @@ function main()
   <script src="//cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/dist/ag-grid-community.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/sql-formatter@15.6.8/dist/sql-formatter.min.js"></script>
+<?php else: ?>
+  <!-- Vendor JavaScript (must be loaded first) -->
+  <script src="assets/vendor/vendor.js"></script>
+<?php endif; ?>
 
   <script>
     window.MultiDbSql = {
@@ -269,6 +277,8 @@ function main()
       appShortNameLower: '<?php echo $appShortNameLower; ?>',
       version: '<?php echo $version; ?>',
       isReadOnlyMode: <?php echo $readOnlyMode ? 'true' : 'false'; ?>,
+      cssDevMode: <?php echo $cssDevMode ? 'true' : 'false'; ?>,
+      jsDevMode: <?php echo $jsDevMode ? 'true' : 'false'; ?>,
     };
   </script>
 
