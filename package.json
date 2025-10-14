@@ -1,6 +1,6 @@
 {
   "name": "multi-db-sql-tool",
-  "version": "1.0.0-alpha",
+  "version": "1.0.0",
   "description": "Multi-database SQL execution tool with unified interface",
   "scripts": {
     "build": "webpack --mode=production",
