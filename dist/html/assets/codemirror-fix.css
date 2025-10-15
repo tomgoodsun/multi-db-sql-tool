@@ -1,0 +1,60 @@
+/* ==========================================================================
+   CodeMirror Height Fix
+   Additional CSS to fix CodeMirror auto-expansion height issue
+   ========================================================================== */
+
+/*
+ * Fix for CodeMirror auto-expanding height problem
+ * References:
+ * - https://stackoverflow.com/questions/28378229/codemirror-how-to-limit-height-in-editor
+ * - https://talk.tiddlywiki.org/t/give-the-codemirror-editor-a-max-height-but-still-auto-shrink/9069
+ */
+
+/* SQL Editor Container - Add height constraints */
+.sql-editor-container {
+  border: 1px solid #ddd;
+  flex: 1;
+  height: calc(100% - 50px);
+  max-height: calc(100% - 50px);
+  overflow: hidden;
+  position: relative;
+}
+
+/* CodeMirror Main Container - Prevent auto height expansion */
+.CodeMirror {
+  border: none;
+  border-radius: 4px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 12px;
+  height: 100% !important;
+  max-height: 100% !important;
+  overflow: hidden;
+  width: 100% !important;
+}
+
+/* CodeMirror Scroll Area - Enable internal scrolling */
+.CodeMirror-scroll {
+  height: 100% !important;
+  max-height: 100% !important;
+  overflow: auto !important;
+}
+
+/* CodeMirror Sizer - Prevent automatic height calculation */
+.CodeMirror-sizer {
+  min-height: auto !important;
+}
+
+/* Editor Container - Fix height ratio and constraints */
+.editor-container {
+  height: 30%;
+  max-height: 50vh;
+  min-height: 200px;
+  overflow: hidden;
+}
+
+/* Result Container - Fix height ratio and constraints */
+.result-container {
+  height: 70%;
+  min-height: 300px;
+  overflow: hidden;
+}
