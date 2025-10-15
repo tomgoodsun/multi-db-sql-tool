@@ -11,10 +11,15 @@ class CodeBuilder
         'favicon.ico',
         'favicon.svg',
         'config.sample.php',
+        // Vendor files
         'assets/vendor/vendor.css',
         'assets/vendor/vendor.js',
         'assets/vendor/fonts/bootstrap-icons.woff',
         'assets/vendor/fonts/bootstrap-icons.woff2',
+        // Application files (keep as external files)
+        'assets/app.css',
+        'assets/app.js',
+        'assets/codemirror-fix.css',
     ];
     private $requires = [];
     private $indexResultLines = [];
@@ -42,13 +47,23 @@ class CodeBuilder
     {
         echo "Starting build process...\n";
         $this->parseIndex();
+        
+        // Merge PHP classes
         foreach ($this->requires as $file) {
             echo "Including: {$file}\n";
             $this->builtContent .= "\n" . $this->readClassFile($file) . "\n";
         }
+        
+        // Add index content
         $this->builtContent .= "\n" . implode("\n", $this->indexResultLines) . "\n";
-        $this->builtContent = $this->readAssets();
+        
+        // Replace dev mode blocks with production paths
+        $this->builtContent = $this->replaceDevMode();
+        
+        // Write output
         $this->writeOutput();
+        
+        // Copy asset files
         $this->copyFiles();
     }
 
@@ -65,23 +80,24 @@ class CodeBuilder
         }
 
         $content = file_get_contents($indexFile);
-
         $lines = explode("\n", $content);
         $lineCount = 0;
 
         foreach ($lines as $line) {
             $trimmedLine = trim($line);
+            
+            // Skip opening <?php tag
             if (empty($trimmedLine) || preg_match('/^<\?php/', $trimmedLine)) {
                 if (++$lineCount === 1) {
-                    // Skip the opening <?php tag
                     continue;
                 }
                 $this->indexResultLines[] = $line;
                 continue;
             }
 
-            if (preg_match('/^require_once\s.*(\/classes\/.*\.php)/', $trimmedLine, $matches)) {
-                $this->requires[] = $this->sourceDir . '/' . $matches[1];
+            // Extract require_once for classes
+            if (preg_match('/^require_once\s+__DIR__\s*\.\s*[\'"](.+\.php)[\'"]/', $trimmedLine, $matches)) {
+                $this->requires[] = $this->sourceDir . $matches[1];
             } else {
                 $this->indexResultLines[] = $line;
             }
@@ -92,7 +108,7 @@ class CodeBuilder
      * Read a class file
      *
      * @param string $filePath
-     * @return void
+     * @return string
      */
     private function readClassFile($filePath)
     {
@@ -109,40 +125,23 @@ class CodeBuilder
     }
 
     /**
-     * Read the assets and inline them
+     * Replace dev mode blocks with production links
      *
      * @return string
      */
-    private function readAssets()
+    private function replaceDevMode()
     {
         $content = $this->builtContent;
 
-        // Replace if ($cssDevMode) or ($jsDevMode) block with vendor scripts/styles
-        $cssPath = 'assets/vendor/vendor.css';
-        $cssContent = sprintf('<link rel="stylesheet" href="%s">', $cssPath);
-        $content = preg_replace('/<\?php if \(\$cssDevMode\): \?>(.*?)<\?php endif; \?>/s', $cssContent, $content);
+        // Replace CSS dev mode block with vendor CSS link
+        $cssReplacement = '<link rel="stylesheet" href="assets/vendor/vendor.css">';
+        $content = preg_replace('/<\?php if \(\$cssDevMode\): \?>(.*?)<\?php endif; \?>/s', $cssReplacement, $content);
 
-        // vendor.js includes <?xml which breaks the PHP parser, so we replace the whole block
-        $jsPath = 'assets/vendor/vendor.js';
-        $jsContent = sprintf('<script src="%s"></script>', $jsPath);
-        $content = preg_replace('/<\?php if \(\$jsDevMode\): \?>(.*?)<\?php endif; \?>/s', $jsContent, $content);
+        // Replace JS dev mode block with vendor JS link
+        $jsReplacement = '<script src="assets/vendor/vendor.js"></script>';
+        $content = preg_replace('/<\?php if \(\$jsDevMode\): \?>(.*?)<\?php endif; \?>/s', $jsReplacement, $content);
 
-        $cssPath = 'assets/app.css';
-        $cssContent = file_get_contents($this->sourceDir . '/' . $cssPath);
-        $cssContent = sprintf("<style>\n/* %s */\n%s\n</style>", $cssPath, $cssContent);
-        $content = preg_replace('/<link\s.*href=["\'](assets\/app\.css)["\'].*>/', $cssContent, $content);
-
-        $cssPath = 'assets/codemirror-fix.css';
-        $cssContent = file_get_contents($this->sourceDir . '/' . $cssPath);
-        $cssContent = sprintf("<style>\n/* %s */\n%s\n</style>", $cssPath, $cssContent);
-        $content = preg_replace('/<link\s.*href=["\'](assets\/codemirror-fix\.css)["\'].*>/', $cssContent, $content);
-
-        $jsPath = 'assets/app.js';
-        $jsContent = file_get_contents($this->sourceDir . '/' . $jsPath);
-        $jsContent = sprintf("<script>\n/* %s */\n%s\n</script>", $jsPath, $jsContent);
-        $content = preg_replace('/<script\s.*src=["\'](assets\/app\.js)["\'].*><\/script>/', $jsContent, $content);
-
-        return trim($content);
+        return $content;
     }
 
     /**
@@ -153,9 +152,9 @@ class CodeBuilder
     private function writeOutput()
     {
         file_put_contents($this->outputFile, $this->builtContent);
-        echo "Build complete!\n";
+        echo "\nBuild complete!\n";
         echo "📁 Output: {$this->outputFile}\n";
-        echo "📦 Size: " . number_format(filesize($this->outputFile) / 1024, 1) . " KB\n"   ;
+        echo "📦 Size: " . number_format(filesize($this->outputFile) / 1024, 1) . " KB\n";
     }
 
     /**
@@ -165,18 +164,21 @@ class CodeBuilder
      */
     private function copyFiles()
     {
+        echo "\nCopying assets...\n";
         foreach ($this->copyFiles as $file) {
             $src = $this->sourceDir . '/' . $file;
             $dest = $this->outputDir . '/' . $file;
             $destDir = dirname($dest);
+            
             if (!is_dir($destDir)) {
                 mkdir($destDir, 0755, true);
             }
+            
             if (file_exists($src)) {
                 copy($src, $dest);
-                echo "Copied file: {$file}\n";
+                echo "  ✓ {$file}\n";
             } else {
-                echo "File not found, skipping: {$file}\n";
+                echo "  ✗ Not found: {$file}\n";
             }
         }
     }
