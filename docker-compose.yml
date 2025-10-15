@@ -6,6 +6,7 @@ services:
       - "8080:80"
     volumes:
       - ./src:/var/www/html
+      - ./dist:/var/www/dist
     depends_on:
       - mysql-shard1
       - mysql-shard2

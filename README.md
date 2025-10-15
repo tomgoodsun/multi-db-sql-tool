@@ -29,9 +29,21 @@ Demo
 
 ## Installation
 
+### Conpact source
+
+1. Put all files under `dist/html` directory to your directory.
+2. Make `config.php` from `config.samaple.php`, and configure it. (ex. database connection settings)
+3. That all.
+
+### Full source
+
 1. Put files under `src` directory to your directory.
 2. Make `config.php` from `config.samaple.php`, and configure it. (ex. database connection settings)
 3. That all.
+
+### Use docker
+
+No docker image distributed now, but you can create.
 
 ## How to Develop
 
@@ -52,6 +64,14 @@ http://localhost:8080
 
 - Three databases as sharding-architecture
 - Each database has two tables, `users` and `orders`
+
+### How to build
+
+```bash
+docker-compose exec web php build.php
+```
+
+`dist/index.php` is generated with included classes, CSS and JavaScript.
 
 ## Frontend Libraries
 

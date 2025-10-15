@@ -8,6 +8,8 @@ class Query
      */
     protected $sql = '';
 
+    protected $isReadOnlyQuery = true;
+
     /**
      * @var array
      */
@@ -34,6 +36,13 @@ class Query
     protected $errors = [];
 
     /**
+     * Connection errors
+     *
+     * @var string[]
+     */
+    protected $connectionErrors = [];
+
+    /**
      * Constructor
      *
      * @param string $sql
@@ -41,10 +50,17 @@ class Query
      */
     public function __construct($sql, $params = [])
     {
-        $this->sql = $sql;
+        $this->sql = trim($sql);
         $this->params = $params;
+        $this->isReadOnlyQuery = Utility::isReadOnlyQuery($this->sql);
     }
 
+    /**
+     * Create DSN string from connection config
+     *
+     * @param array $conn
+     * @return string
+     */
     public static function createDsn(array $conn)
     {
         $dsn = 'mysql:';
@@ -54,6 +70,30 @@ class Query
             }
         }
         return $dsn;
+    }
+
+    /**
+     * Create PDO connection with proper options
+     *
+     * @param string $dsn
+     * @param string $username
+     * @param string $password
+     * @return \PDO
+     */
+    protected function createConnection($dsn, $username, $password)
+    {
+        $limits = Config::getInstance()->get('limits', []);
+        $timeout = $limits['connection_timeout'] ?? 10;
+
+        $options = [
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+            \PDO::ATTR_TIMEOUT => $timeout,
+            \PDO::MYSQL_ATTR_INIT_COMMAND => "SET sql_mode='STRICT_TRANS_TABLES', time_zone='+00:00'",
+            \PDO::MYSQL_ATTR_FOUND_ROWS => true
+        ];
+
+        return new \PDO($dsn, $username, $password, $options);
     }
 
     /**
@@ -81,8 +121,11 @@ class Query
      */
     public function addConnection($name, $dsn, $username, $password)
     {
-        $this->connections[$name] = new \PDO($dsn, $username, $password);
-        $this->connections[$name]->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        try {
+            $this->connections[$name] = $this->createConnection($dsn, $username, $password);
+        } catch (\Throwable $e) {
+            $this->connectionErrors[$name] = $e->getMessage();
+        }
         return $this;
     }
 
@@ -92,18 +135,18 @@ class Query
      * @param string $shardName
      * @param array $result
      * @param array $results
-     * @return void
+     * @return array
      */
     public static function formatResult($shardName, array $result, array &$results)
     {
         foreach ($result as &$row) {
-            $tmp = [];
-            $tmp['__shard'] = $shardName;
+            $tmp = ['__shard' => $shardName];
             foreach ($row as $k => $v) {
                 $tmp[$k] = $v;
             }
             $results[] = $tmp;
         }
+
         return $result;
     }
 
@@ -122,9 +165,15 @@ class Query
                 $stmt = $connection->prepare($this->sql);
                 $stmt->execute($this->params);
                 $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-                $result = self::formatResult($name, $result, $results);
+                if ($this->isReadOnlyQuery) {
+                    $rowCount = count($result);
+                    $result = self::formatResult($name, $result, $results);
+                } else {
+                    $rowCount = $stmt->rowCount();
+                    $result = self::formatResult($name, [['affected_rows' => $rowCount]], $results);
+                }
                 $this->resultSet[$name] = $result;
-                $this->rowCounts[$name] = count($result);
+                $this->rowCounts[$name] = $rowCount;
             } catch (\Throwable $e) {
                 $this->errors[$name] = [
                     'shard' => $name,
@@ -136,7 +185,41 @@ class Query
         return [
             'rows' => array_sum($this->rowCounts),
             'results' => $results,
-            'errors' => array_values($this->errors),
+            'errors' => $this->errors,
         ];
+    }
+
+    /**
+     * Get the list of tables for a specific cluster.
+     *
+     * @param string $clusterName
+     * @return array
+     */
+    public static function getTableList($clusterName)
+    {
+        $tables = [];
+        $error = null;
+        try {
+            $sql = 'SELECT TABLE_NAME, TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = database();';
+            $query = new self($sql);
+            $query->bulkAddConnections(Config::getInstance()->getDatabaseSettings($clusterName));
+            $result = $query->query();
+            foreach ($result['results'] as $item) {
+                $shard = $item['__shard'];
+                $tableName = $item['TABLE_NAME'];
+
+                if (!isset($tables[$tableName])) {
+                    $tables[$tableName] = [
+                        'name' => $tableName,
+                        'comment' => $item['TABLE_COMMENT'],
+                        'databases' => [],
+                    ];
+                }
+                $tables[$tableName]['databases'][] = $shard;
+            }
+        } catch (\Throwable $e) {
+            $error = $e->getMessage();
+        }
+        return [$tables, $error, $query->connectionErrors];
     }
 }
