@@ -47,22 +47,22 @@ class CodeBuilder
     {
         echo "Starting build process...\n";
         $this->parseIndex();
-        
+
         // Merge PHP classes
         foreach ($this->requires as $file) {
             echo "Including: {$file}\n";
             $this->builtContent .= "\n" . $this->readClassFile($file) . "\n";
         }
-        
+
         // Add index content
         $this->builtContent .= "\n" . implode("\n", $this->indexResultLines) . "\n";
-        
+
         // Replace dev mode blocks with production paths
         $this->builtContent = $this->replaceDevMode();
-        
+
         // Write output
         $this->writeOutput();
-        
+
         // Copy asset files
         $this->copyFiles();
     }
@@ -85,7 +85,7 @@ class CodeBuilder
 
         foreach ($lines as $line) {
             $trimmedLine = trim($line);
-            
+
             // Skip opening <?php tag
             if (empty($trimmedLine) || preg_match('/^<\?php/', $trimmedLine)) {
                 if (++$lineCount === 1) {
@@ -134,11 +134,11 @@ class CodeBuilder
         $content = $this->builtContent;
 
         // Replace CSS dev mode block with vendor CSS link
-        $cssReplacement = '<link rel="stylesheet" href="assets/vendor/vendor.css">';
+        $cssReplacement = '  <link rel="stylesheet" href="assets/vendor/vendor.css">';
         $content = preg_replace('/<\?php if \(\$cssDevMode\): \?>(.*?)<\?php endif; \?>/s', $cssReplacement, $content);
 
         // Replace JS dev mode block with vendor JS link
-        $jsReplacement = '<script src="assets/vendor/vendor.js"></script>';
+        $jsReplacement = '  <script src="assets/vendor/vendor.js"></script>';
         $content = preg_replace('/<\?php if \(\$jsDevMode\): \?>(.*?)<\?php endif; \?>/s', $jsReplacement, $content);
 
         return $content;
@@ -169,11 +169,11 @@ class CodeBuilder
             $src = $this->sourceDir . '/' . $file;
             $dest = $this->outputDir . '/' . $file;
             $destDir = dirname($dest);
-            
+
             if (!is_dir($destDir)) {
                 mkdir($destDir, 0755, true);
             }
-            
+
             if (file_exists($src)) {
                 copy($src, $dest);
                 echo "  ✓ {$file}\n";
