@@ -4,9 +4,32 @@ namespace MultiDbSqlTool;
 
 class CodeBuilder
 {
+    /**
+     * Source directory
+     *
+     * @var string
+     */
     private $sourceDir;
+
+    /**
+     * Output directory
+     *
+     * @var string
+     */
     private $outputDir;
+
+    /**
+     * Output file
+     *
+     * @var string
+     */
     private $outputFile;
+
+    /**
+     * Files to copy
+     *
+     * @var array
+     */
     private $copyFiles = [
         'favicon.ico',
         'favicon.svg',
@@ -21,8 +44,26 @@ class CodeBuilder
         'assets/app.js',
         'assets/codemirror-fix.css',
     ];
+
+    /**
+     * Required files
+     *
+     * @var array
+     */
     private $requires = [];
+
+    /**
+     * Index result lines
+     *
+     * @var array
+     */
     private $indexResultLines = [];
+
+    /**
+     * Built content
+     *
+     * @var string
+     */
     private $builtContent = "<?php\n\nnamespace MultiDbSqlTool;\n\n";
 
     /**

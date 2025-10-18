@@ -8,10 +8,30 @@ class WebHandler
      */
     protected $sessionManager;
 
+    /**
+     * Request method
+     *
+     * @var string
+     */
     protected $method = '';
+
+    /**
+     * Action parameter
+     *
+     * @var string
+     */
     protected $action = '';
+
+    /**
+     * Cluster name parameter
+     *
+     * @var string
+     */
     protected $clusterName = '';
 
+    /**
+     * Constructor
+     */
     public function __construct()
     {
         $this->sessionManager = new SessionManager();
