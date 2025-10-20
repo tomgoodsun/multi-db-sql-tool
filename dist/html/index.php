@@ -11,7 +11,7 @@ class Config
      */
     const APP_NAME = 'Multi-DB SQL Tool';
     const APP_SHORT_NAME = 'mDBSQL';
-    const VERSION = '1.0.0';
+    const VERSION = '1.1.0';
 
     const DEFAULT_SESSION_NAME = 'MDBSQL_SESSION';
     const DEFAULT_SESSION_LIFETIME = 86400; // 1 day
@@ -387,6 +387,9 @@ class Query
      */
     protected $sql = '';
 
+    /**
+     * @var boolean
+     */
     protected $isReadOnlyQuery = true;
 
     /**
@@ -427,7 +430,7 @@ class Query
      * @param string $sql
      * @param array $params
      */
-    public function __construct($sql, $params = [])
+    public function __construct($sql, array $params = [])
     {
         $this->sql = trim($sql);
         $this->params = $params;
@@ -481,7 +484,7 @@ class Query
      * @param array $connections
      * @return $this
      */
-    public function bulkAddConnections($connections)
+    public function bulkAddConnections(array $connections)
     {
         foreach ($connections as $name => $conn) {
             $this->addConnection($name, self::createDsn($conn), $conn['username'], $conn['password']);
@@ -610,10 +613,30 @@ class WebHandler
      */
     protected $sessionManager;
 
+    /**
+     * Request method
+     *
+     * @var string
+     */
     protected $method = '';
+
+    /**
+     * Action parameter
+     *
+     * @var string
+     */
     protected $action = '';
+
+    /**
+     * Cluster name parameter
+     *
+     * @var string
+     */
     protected $clusterName = '';
 
+    /**
+     * Constructor
+     */
     public function __construct()
     {
         $this->sessionManager = new SessionManager();
@@ -798,9 +821,14 @@ class WebHandler
 
                     $executionTime = round((microtime(true) - $startTime) * 1000, 2); // ms
                     $totalRows += $result['rows'];
+                    if (false === $hasError && !empty($result['errors'])) {
+                        $hasError = true;
+                    }
                 } catch (\Throwable $e) {
                     $error = $e->getMessage();
-                    $hasError = true;
+                    if (false === $hasError) {
+                        $hasError = true;
+                    }
                 }
 
                 $result += [
@@ -1178,6 +1206,16 @@ function main()
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x"></i> Cancel</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loading-overlay" class="loading-overlay" style="display: none;">
+    <div class="loading-spinner">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <div class="loading-text">Executing SQL...</div>
     </div>
   </div>
 

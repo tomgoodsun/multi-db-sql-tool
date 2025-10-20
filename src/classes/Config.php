@@ -10,7 +10,7 @@ class Config
      */
     const APP_NAME = 'Multi-DB SQL Tool';
     const APP_SHORT_NAME = 'mDBSQL';
-    const VERSION = '1.0.0';
+    const VERSION = '1.1.0';
 
     const DEFAULT_SESSION_NAME = 'MDBSQL_SESSION';
     const DEFAULT_SESSION_LIFETIME = 86400; // 1 day

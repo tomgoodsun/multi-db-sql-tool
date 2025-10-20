@@ -50,6 +50,29 @@
   let sqlExecutionDialog = null;
   let historyDialogElem = document.getElementById('sql-history');
   let historyDialog = null;
+  let loadingOverlay = document.getElementById('loading-overlay');
+
+  /**
+   * Show loading overlay
+   *
+   * @returns {void}
+   */
+  let showLoading = () => {
+    if (loadingOverlay) {
+      loadingOverlay.style.display = 'flex';
+    }
+  };
+
+  /**
+   * Hide loading overlay
+   *
+   * @returns {void}
+   */
+  let hideLoading = () => {
+    if (loadingOverlay) {
+      loadingOverlay.style.display = 'none';
+    }
+  };
 
   /**
    * Format the SQL query in the editor using sql-formatter library.
@@ -176,6 +199,7 @@
     }
 
     isExecuting = true;
+    showLoading();
 
     try {
       // POST / API call to execute SQL
@@ -211,10 +235,12 @@
         })
         .finally(() => {
           isExecuting = false;
+          hideLoading();
         });
     } catch (error) {
       console.error('Unexpected error:', error);
       isExecuting = false;
+      hideLoading();
     }
 
     sqlExecutionDialog.hide();
@@ -527,6 +553,7 @@
     response.resultSet.forEach(result => {
       let id = result.id;
       let errors = result.errors;
+      let errorCount = Object.keys(result.errors).length;
       let rows = result.rows;
       let sql = result.sql;
       let results = result.results;
@@ -542,7 +569,7 @@
       let tabBtn = document.createElement('button');
       tabBtn.className = 'results-tab';
 
-      if (errors.length > 0) {
+      if (errorCount > 0) {
         tabBtn.classList.add('error');
         tabBtn.innerHTML = `<i class="bi bi-exclamation-triangle"></i> Query ${id} (${rows})`;
       } else {
@@ -613,11 +640,12 @@
       tabPane.setAttribute('role', 'tabpanel');
       gridArea.appendChild(tabPane);
 
-      if (errors.length > 0) {
+      if (errorCount > 0) {
         let errorListDiv = document.createElement('div');
         errorListDiv.className = 'error-list';
         tabPane.appendChild(errorListDiv);
-        for (let error of errors) {
+        for (let i in errors) {
+          let error = errors[i];
           let errorDiv = document.createElement('div');
           errorDiv.className = 'alert alert-danger align-items-center sql-error';
           errorDiv.setAttribute('role', 'alert');

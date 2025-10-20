@@ -8,10 +8,30 @@ class WebHandler
      */
     protected $sessionManager;
 
+    /**
+     * Request method
+     *
+     * @var string
+     */
     protected $method = '';
+
+    /**
+     * Action parameter
+     *
+     * @var string
+     */
     protected $action = '';
+
+    /**
+     * Cluster name parameter
+     *
+     * @var string
+     */
     protected $clusterName = '';
 
+    /**
+     * Constructor
+     */
     public function __construct()
     {
         $this->sessionManager = new SessionManager();
@@ -196,9 +216,14 @@ class WebHandler
 
                     $executionTime = round((microtime(true) - $startTime) * 1000, 2); // ms
                     $totalRows += $result['rows'];
+                    if (false === $hasError && !empty($result['errors'])) {
+                        $hasError = true;
+                    }
                 } catch (\Throwable $e) {
                     $error = $e->getMessage();
-                    $hasError = true;
+                    if (false === $hasError) {
+                        $hasError = true;
+                    }
                 }
 
                 $result += [

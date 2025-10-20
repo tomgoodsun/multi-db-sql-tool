@@ -40,7 +40,7 @@ if [ $? -eq 0 ]; then
     echo "  3. Access application:"
     echo "     http://localhost:8080"
     echo ""
-    
+
     # イメージ情報を表示
     echo "Image info:"
     docker images "$IMAGE_NAME:$VERSION"

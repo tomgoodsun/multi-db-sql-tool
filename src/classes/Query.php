@@ -8,6 +8,9 @@ class Query
      */
     protected $sql = '';
 
+    /**
+     * @var boolean
+     */
     protected $isReadOnlyQuery = true;
 
     /**
@@ -48,7 +51,7 @@ class Query
      * @param string $sql
      * @param array $params
      */
-    public function __construct($sql, $params = [])
+    public function __construct($sql, array $params = [])
     {
         $this->sql = trim($sql);
         $this->params = $params;
@@ -102,7 +105,7 @@ class Query
      * @param array $connections
      * @return $this
      */
-    public function bulkAddConnections($connections)
+    public function bulkAddConnections(array $connections)
     {
         foreach ($connections as $name => $conn) {
             $this->addConnection($name, self::createDsn($conn), $conn['username'], $conn['password']);

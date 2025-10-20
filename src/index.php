@@ -257,6 +257,16 @@ function main()
     </div>
   </div>
 
+  <!-- Loading Overlay -->
+  <div id="loading-overlay" class="loading-overlay" style="display: none;">
+    <div class="loading-spinner">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <div class="loading-text">Executing SQL...</div>
+    </div>
+  </div>
+
 <?php if ($jsDevMode): ?>
   <!-- JavaScript Libraries -->
   <script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
