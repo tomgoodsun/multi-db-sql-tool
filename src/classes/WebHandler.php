@@ -216,9 +216,14 @@ class WebHandler
 
                     $executionTime = round((microtime(true) - $startTime) * 1000, 2); // ms
                     $totalRows += $result['rows'];
+                    if (false === $hasError && !empty($result['errors'])) {
+                        $hasError = true;
+                    }
                 } catch (\Throwable $e) {
                     $error = $e->getMessage();
-                    $hasError = true;
+                    if (false === $hasError) {
+                        $hasError = true;
+                    }
                 }
 
                 $result += [
@@ -237,6 +242,7 @@ class WebHandler
 
             $this->sessionManager->addQueryHistory($reqSql, $this->clusterName);
 
+            //sleep(3);
             $this->json([
                 'cluster' => $this->clusterName,
                 'resultSet' => $resultSet,
