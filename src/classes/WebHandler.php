@@ -242,7 +242,6 @@ class WebHandler
 
             $this->sessionManager->addQueryHistory($reqSql, $this->clusterName);
 
-            //sleep(3);
             $this->json([
                 'cluster' => $this->clusterName,
                 'resultSet' => $resultSet,
